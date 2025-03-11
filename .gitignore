@@ -39,3 +39,31 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE and editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local development specific files
+.env*.local
+
+# Logs
+logs
+*.log
+
+# Cache directories
+.npm
+.eslintcache
+
+# Optional: if using GraphQL
+*.graphql.d.ts
+*.graphqls.d.ts
+
+# Storybook
+storybook-static/
+
+# Serverless directories
+.serverless/
