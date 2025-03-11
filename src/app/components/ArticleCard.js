@@ -1,8 +1,11 @@
 import Link from 'next/link';
 
 export default function ArticleCard({ article }) {
+  // Use ID as fallback if slug is not available
+  const linkPath = article.slug ? `/articles/${article.slug}` : `/articles/${article.id}`;
+  
   return (
-    <div className="article-card">
+    <Link href={linkPath} className="block article-card hover:shadow-lg transition-shadow">
       <div className="article-image">
         {article.image ? (
           <img 
@@ -17,17 +20,15 @@ export default function ArticleCard({ article }) {
       </div>
       <div className="article-content">
         <h2 className="article-title">
-          <Link href={`/articles/${article.slug}`}>
-            {article.title}
-          </Link>
+          {article.title}
         </h2>
         <p className="article-excerpt">
           {article.excerpt || article.content?.substring(0, 150) + '...'}
         </p>
-        <Link href={`/articles/${article.slug}`} className="read-more">
+        <span className="read-more">
           READ MORE
-        </Link>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }

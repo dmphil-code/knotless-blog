@@ -15,17 +15,7 @@ export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:d
         page,
         pageSize,
       },
-      populate: {
-        thumbnail: {
-          fields: ['url', 'width', 'height', 'alternativeText'],
-        },
-        author: {
-          fields: ['name', 'email'],
-        },
-        categories: {
-          fields: ['name', 'slug'],
-        },
-      },
+      populate: '*'
     };
 
     // Add filters if they exist
@@ -33,17 +23,15 @@ export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:d
       queryParams.filters = filters;
     }
 
+    console.log('Query params for getArticles:', queryParams);
+
     const response = await api.get('/articles', {
-      params: {
-        populate: '*',
-        pagination: {
-          page,
-          pageSize,
-        },
-        ...queryParams,
-      },
+      params: queryParams
     });
 
+    console.log('Strapi response:', response.data);
+    
+    // Return the data as is - since your Strapi doesn't use the attributes structure
     return {
       data: response.data.data,
       meta: response.data.meta,
@@ -54,9 +42,30 @@ export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:d
   }
 };
 
+// Get a single article by ID
+export const getArticleById = async (id) => {
+  try {
+    const response = await api.get(`/articles/${id}`, {
+      params: {
+        populate: '*',
+      },
+    });
+
+    console.log('Article by ID response:', response.data);
+    
+    // Return the article data directly, not wrapped in response.data.data
+    return response.data || null;
+  } catch (error) {
+    console.error('Error fetching article by ID:', error);
+    return null;
+  }
+};
+
 // Get a single article by slug
 export const getArticleBySlug = async (slug) => {
   try {
+    console.log('Fetching article by slug:', slug);
+    
     const response = await api.get('/articles', {
       params: {
         filters: {
@@ -64,20 +73,13 @@ export const getArticleBySlug = async (slug) => {
             $eq: slug,
           },
         },
-        populate: {
-          thumbnail: {
-            fields: ['url', 'width', 'height', 'alternativeText'],
-          },
-          author: {
-            populate: ['picture'],
-          },
-          categories: {
-            fields: ['name', 'slug'],
-          },
-        },
+        populate: '*',
       },
     });
 
+    console.log('Article by slug response:', response.data);
+    
+    // Return the first article directly (not inside attributes)
     return response.data.data[0] || null;
   } catch (error) {
     console.error('Error fetching article by slug:', error);
@@ -116,6 +118,8 @@ export const searchArticles = async (query, page = 1, pageSize = 10) => {
         },
       },
     });
+
+    console.log('Search results:', response.data);
 
     return {
       data: response.data.data,

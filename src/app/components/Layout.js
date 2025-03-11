@@ -2,16 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
-export default function Layout({ children, title, description }) {
-  const router = useRouter();
+export default function Layout({ children, title, description, onSearchSubmit }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    if (onSearchSubmit && searchQuery.trim()) {
+      onSearchSubmit(searchQuery.trim());
     }
   };
 
