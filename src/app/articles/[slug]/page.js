@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getArticleBySlug, getArticleById } from '../../services/api';
 import Layout from '../../components/Layout';
+import ReactMarkdown from 'react-markdown';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -52,11 +53,9 @@ export default function ArticleDetail() {
 
   if (loading) {
     return (
-      <Layout title="Loading...">
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '256px' }}>
-            <p style={{ fontSize: '1.25rem' }}>Loading article...</p>
-          </div>
+      <Layout>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+          <p style={{ fontSize: '1.25rem', color: '#666' }}>Loading article...</p>
         </div>
       </Layout>
     );
@@ -64,15 +63,24 @@ export default function ArticleDetail() {
 
   if (error || !article) {
     return (
-      <Layout title="Article Not Found">
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', marginBottom: '16px' }}>Article Not Found</h1>
-            <p style={{ fontSize: '1.25rem', marginBottom: '32px' }}>The article you're looking for doesn't exist or has been removed.</p>
-            <Link href="/" style={{ color: '#2563eb', textDecoration: 'none' }}>
-              Return to Homepage
-            </Link>
-          </div>
+      <Layout>
+        <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#E9887E' }}>
+            Article Not Found
+          </h1>
+          <p style={{ fontSize: '1.125rem', marginBottom: '2rem', color: '#666' }}>
+            The article you're looking for doesn't exist or has been removed.
+          </p>
+          <Link href="/" style={{ 
+            backgroundColor: '#E9887E', 
+            color: 'white', 
+            padding: '0.75rem 1.5rem', 
+            borderRadius: '2rem', 
+            textDecoration: 'none',
+            display: 'inline-block'
+          }}>
+            Return to Homepage
+          </Link>
         </div>
       </Layout>
     );
@@ -87,212 +95,164 @@ export default function ArticleDetail() {
       })
     : 'Unknown date';
 
-  // Prepare content for rendering
-  const renderContent = () => {
-    if (!article.content) return null;
-    
-    // Check if content is an array (Strapi rich text format)
-    if (Array.isArray(article.content)) {
-      return (
-        <div>
-          {article.content.map((block, index) => {
-            // Handle different block types
-            switch (block.type) {
-              case 'paragraph':
-                return (
-                  <p key={index} style={{ marginBottom: '16px' }}>
-                    {block.children && block.children.map((child, childIndex) => {
-                      if (child.type === 'link') {
-                        return (
-                          <a 
-                            key={childIndex} 
-                            href={child.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={{ color: '#2563eb', textDecoration: 'none' }}
-                          >
-                            {child.children && child.children[0] ? child.children[0].text : ''}
-                          </a>
-                        );
-                      }
-                      return child.text || '';
-                    })}
-                  </p>
-                );
-              
-              case 'heading':
-                const headingStyle = {
-                  fontWeight: 'bold',
-                  marginTop: '16px',
-                  marginBottom: '16px'
-                };
-                
-                switch (block.level) {
-                  case 1:
-                    return <h1 key={index} style={{ ...headingStyle, fontSize: '2.25rem' }}>{block.children[0]?.text || ''}</h1>;
-                  case 2:
-                    return <h2 key={index} style={{ ...headingStyle, fontSize: '1.875rem' }}>{block.children[0]?.text || ''}</h2>;
-                  case 3:
-                    return <h3 key={index} style={{ ...headingStyle, fontSize: '1.5rem' }}>{block.children[0]?.text || ''}</h3>;
-                  case 4:
-                    return <h4 key={index} style={{ ...headingStyle, fontSize: '1.25rem' }}>{block.children[0]?.text || ''}</h4>;
-                  case 5:
-                    return <h5 key={index} style={{ ...headingStyle, fontSize: '1.125rem' }}>{block.children[0]?.text || ''}</h5>;
-                  case 6:
-                    return <h6 key={index} style={{ ...headingStyle, fontSize: '1rem' }}>{block.children[0]?.text || ''}</h6>;
-                  default:
-                    return <h3 key={index} style={{ ...headingStyle, fontSize: '1.5rem' }}>{block.children[0]?.text || ''}</h3>;
-                }
-              
-              case 'list':
-                const listStyle = {
-                  paddingLeft: '20px',
-                  marginBottom: '16px',
-                };
-                
-                if (block.format === 'ordered') {
-                  return (
-                    <ol key={index} style={{ ...listStyle, listStyleType: 'decimal' }}>
-                      {block.children && block.children.map((item, itemIndex) => (
-                        <li key={itemIndex} style={{ marginLeft: '0', paddingLeft: '0' }}>
-                          {item.children && item.children[0] ? item.children[0].text : ''}
-                        </li>
-                      ))}
-                    </ol>
-                  );
-                } else {
-                  return (
-                    <ul key={index} style={{ ...listStyle, listStyleType: 'disc' }}>
-                      {block.children && block.children.map((item, itemIndex) => (
-                        <li key={itemIndex} style={{ marginLeft: '0', paddingLeft: '0' }}>
-                          {item.children && item.children[0] ? item.children[0].text : ''}
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                }
-              
-              default:
-                if (block.text) {
-                  return <p key={index} style={{ marginBottom: '16px' }}>{block.text}</p>;
-                }
-                return null;
-            }
-          })}
-        </div>
-      );
-    }
-    
-    // Fallback for string content
-    return <div dangerouslySetInnerHTML={{ __html: article.content }} />;
-  };
-
   return (
     <Layout>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
-        <article style={{ maxWidth: '768px', margin: '0 auto' }}>
-          {/* Back link positioned above the main title */}
-          <Link 
-            href="/" 
-            style={{ 
-              color: '#2563eb', 
-              textDecoration: 'none', 
-              display: 'inline-block', 
-              marginBottom: '24px' 
-            }}
-          >
-            ← Back to all articles
-          </Link>
+      <article style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
+        {/* Back link positioned above the main title */}
+        <Link 
+          href="/" 
+          style={{ 
+            color: '#E9887E', 
+            textDecoration: 'none', 
+            display: 'inline-block', 
+            marginBottom: '2rem',
+            fontWeight: '500'
+          }}
+        >
+          ← Back to all articles
+        </Link>
 
-          {/* Single main title */}
-          <h1 style={{ 
-            fontSize: '2.25rem', 
-            fontWeight: 'bold', 
-            marginBottom: '24px', 
-            textAlign: 'center' 
-          }}>
-            {article.title}
-          </h1>
+        {/* Single main title */}
+        <h1 style={{ 
+          fontSize: '2.5rem', 
+          fontWeight: 'bold', 
+          marginBottom: '1.5rem', 
+          textAlign: 'center',
+          color: '#333'
+        }}>
+          {article.title}
+        </h1>
 
-          {/* Author and date stacked vertically */}
+        {/* Author and date stacked vertically */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          textAlign: 'center', 
+          marginBottom: '2rem' 
+        }}>
+          {article.author && (
+            <div style={{ marginBottom: '0.5rem' }}>
+              <span style={{ color: '#555', fontWeight: '500' }}>{article.author.name}</span>
+            </div>
+          )}
+          <span style={{ color: '#777' }}>{publishDate}</span>
+        </div>
+
+        {/* Centered thumbnail image */}
+        {article.thumbnail && article.thumbnail.url && (
           <div style={{ 
+            marginBottom: '2.5rem', 
             display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            textAlign: 'center', 
-            marginBottom: '32px' 
+            justifyContent: 'center' 
           }}>
-            {article.author && (
-              <div style={{ marginBottom: '8px' }}>
-                <span style={{ color: '#374151', fontWeight: '500' }}>{article.author.name}</span>
-              </div>
-            )}
-            <span style={{ color: '#6b7280' }}>{publishDate}</span>
+            <img
+              src={`${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`}
+              alt={article.title}
+              style={{ 
+                borderRadius: '12px', 
+                maxHeight: '450px', 
+                maxWidth: '100%',
+                objectFit: 'cover',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+              }}
+            />
           </div>
+        )}
 
-          {/* Centered thumbnail image */}
-          {article.thumbnail && article.thumbnail.url && (
+        {/* Article content with proper styling - Using content field */}
+        <div style={{ margin: '0 auto' }} className="markdown-content">
+          {article.content ? (
+            <ReactMarkdown
+              components={{
+                img: ({node, src, alt, ...props}) => {
+                  // Handle internal image URLs
+                  if (src && !src.startsWith('http')) {
+                    src = `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${src}`;
+                  }
+                  return (
+                    <div style={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
+                      <img 
+                        src={src} 
+                        alt={alt} 
+                        style={{
+                          maxWidth: '100%', 
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                        }} 
+                        {...props} 
+                      />
+                    </div>
+                  );
+                },
+                h1: ({node, ...props}) => <h1 style={{fontSize: '2.25rem', fontWeight: 'bold', margin: '2rem 0 1rem', color: '#444'}} {...props} />,
+                h2: ({node, ...props}) => <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', margin: '1.75rem 0 1rem', color: '#444'}} {...props} />,
+                h3: ({node, ...props}) => <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', margin: '1.5rem 0 0.75rem', color: '#444'}} {...props} />,
+                p: ({node, ...props}) => <p style={{margin: '1.25rem 0', lineHeight: '1.7', color: '#444', fontSize: '1.125rem'}} {...props} />,
+                ul: ({node, ...props}) => <ul style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'disc'}} {...props} />,
+                ol: ({node, ...props}) => <ol style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'decimal'}} {...props} />,
+                li: ({node, ...props}) => <li style={{marginBottom: '0.75rem', lineHeight: '1.6', color: '#444'}} {...props} />,
+                a: ({node, ...props}) => <a style={{color: '#E9887E', textDecoration: 'underline'}} {...props} />,
+                strong: ({node, ...props}) => <strong style={{fontWeight: 'bold', color: '#333'}} {...props} />,
+                blockquote: ({node, ...props}) => <blockquote style={{
+                  borderLeft: '4px solid #E9887E',
+                  paddingLeft: '1.5rem',
+                  marginLeft: '0',
+                  marginRight: '0',
+                  marginTop: '1.5rem',
+                  marginBottom: '1.5rem',
+                  fontStyle: 'italic',
+                  color: '#555'
+                }} {...props} />
+              }}
+            >
+              {article.content}
+            </ReactMarkdown>
+          ) : (
+            <p>No content available for this article.</p>
+          )}
+        </div>
+
+        {/* Categories */}
+        {article.categories && article.categories.length > 0 && (
+          <div style={{ 
+            marginTop: '3rem', 
+            paddingTop: '1.5rem', 
+            borderTop: '1px solid #eee' 
+          }}>
+            <h2 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: '600', 
+              marginBottom: '1rem',
+              color: '#444'
+            }}>Categories</h2>
             <div style={{ 
-              marginBottom: '40px', 
               display: 'flex', 
-              justifyContent: 'center' 
+              flexWrap: 'wrap', 
+              gap: '0.5rem' 
             }}>
-              <img
-                src={`${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`}
-                alt={article.title}
-                style={{ 
-                  borderRadius: '8px', 
-                  maxHeight: '384px', 
-                  objectFit: 'cover' 
-                }}
-              />
+              {article.categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/categories/${category.slug || category.id}`}
+                  style={{ 
+                    backgroundColor: '#FFE8C9', 
+                    color: '#773800',
+                    padding: '0.5rem 1rem', 
+                    borderRadius: '2rem', 
+                    fontSize: '0.875rem',
+                    textDecoration: 'none',
+                    fontWeight: '500'
+                  }}
+                >
+                  {category.name}
+                </Link>
+              ))}
             </div>
-          )}
-
-          {/* Article content with proper margins */}
-          <div style={{ margin: '0 auto' }}>
-            {renderContent()}
           </div>
-
-          {/* Categories */}
-          {article.categories && article.categories.length > 0 && (
-            <div style={{ 
-              marginTop: '48px', 
-              paddingTop: '24px', 
-              borderTop: '1px solid #e5e7eb' 
-            }}>
-              <h2 style={{ 
-                fontSize: '1.25rem', 
-                fontWeight: '600', 
-                marginBottom: '16px' 
-              }}>Categories</h2>
-              <div style={{ 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: '8px' 
-              }}>
-                {article.categories.map((category) => (
-                  <Link
-                    key={category.id}
-                    href={`/categories/${category.slug || category.id}`}
-                    style={{ 
-                      backgroundColor: '#f3f4f6', 
-                      padding: '4px 12px', 
-                      borderRadius: '9999px', 
-                      fontSize: '0.875rem',
-                      textDecoration: 'none',
-                      color: 'inherit'
-                    }}
-                  >
-                    {category.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </article>
-      </div>
+        )}
+      </article>
     </Layout>
   );
 }
