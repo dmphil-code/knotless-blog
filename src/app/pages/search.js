@@ -25,6 +25,8 @@ export default function Search() {
       const currentPage = page ? parseInt(page) : 1;
       performSearch(q, currentPage);
     }
+    // q and page are from URL params, so they should be included in dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, page]);
 
   const performSearch = async (query, currentPage = 1) => {
@@ -97,7 +99,7 @@ export default function Search() {
 
           {articles.length === 0 && q && (
             <div className="text-center py-12">
-              <p className="text-xl mb-4">No articles found for "{q}"</p>
+              <p className="text-xl mb-4">No articles found for &quot;{q}&quot;</p>
               <p className="text-gray-600 mb-6">Try different keywords or browse all articles</p>
               <Link href="/" className="text-blue-600 hover:underline">
                 Return to Homepage

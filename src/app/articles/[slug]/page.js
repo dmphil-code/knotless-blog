@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { getArticleBySlug, getArticleById } from '../../services/api';
 import Layout from '../../components/Layout';
@@ -69,7 +70,7 @@ export default function ArticleDetail() {
             Article Not Found
           </h1>
           <p style={{ fontSize: '1.125rem', marginBottom: '2rem', color: '#666' }}>
-            The article you're looking for doesn't exist or has been removed.
+            The article you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <Link href="/" style={{ 
             backgroundColor: '#E9887E', 
@@ -94,6 +95,50 @@ export default function ArticleDetail() {
         day: 'numeric'
       })
     : 'Unknown date';
+
+  // Custom component mapping for ReactMarkdown
+  const components = {
+    img: ({ src, alt, ...props }) => {
+      // Handle internal image URLs
+      if (src && !src.startsWith('http')) {
+        src = `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${src}`;
+      }
+      return (
+        <div style={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
+          {/* Use regular img tag with warning suppressed by ESLint config */}
+          <img 
+            src={src} 
+            alt={alt || ''} 
+            style={{
+              maxWidth: '100%', 
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+            }} 
+            {...props} 
+          />
+        </div>
+      );
+    },
+    h1: ({ children }) => <h1 style={{fontSize: '2.25rem', fontWeight: 'bold', margin: '2rem 0 1rem', color: '#444'}}>{children}</h1>,
+    h2: ({ children }) => <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', margin: '1.75rem 0 1rem', color: '#444'}}>{children}</h2>,
+    h3: ({ children }) => <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', margin: '1.5rem 0 0.75rem', color: '#444'}}>{children}</h3>,
+    p: ({ children }) => <p style={{margin: '1.25rem 0', lineHeight: '1.7', color: '#444', fontSize: '1.125rem'}}>{children}</p>,
+    ul: ({ children }) => <ul style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'disc'}}>{children}</ul>,
+    ol: ({ children }) => <ol style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'decimal'}}>{children}</ol>,
+    li: ({ children }) => <li style={{marginBottom: '0.75rem', lineHeight: '1.6', color: '#444'}}>{children}</li>,
+    a: ({ children, href }) => <a href={href} style={{color: '#E9887E', textDecoration: 'underline'}}>{children}</a>,
+    strong: ({ children }) => <strong style={{fontWeight: 'bold', color: '#333'}}>{children}</strong>,
+    blockquote: ({ children }) => <blockquote style={{
+      borderLeft: '4px solid #E9887E',
+      paddingLeft: '1.5rem',
+      marginLeft: '0',
+      marginRight: '0',
+      marginTop: '1.5rem',
+      marginBottom: '1.5rem',
+      fontStyle: 'italic',
+      color: '#555'
+    }}>{children}</blockquote>
+  };
 
   return (
     <Layout>
@@ -147,9 +192,10 @@ export default function ArticleDetail() {
             display: 'flex', 
             justifyContent: 'center' 
           }}>
+            {/* Keep using img tag with ESLint warning suppressed */}
             <img
               src={`${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`}
-              alt={article.title}
+              alt={article.title || 'Article thumbnail'}
               style={{ 
                 borderRadius: '12px', 
                 maxHeight: '450px', 
@@ -164,49 +210,7 @@ export default function ArticleDetail() {
         {/* Article content with proper styling - Using content field */}
         <div style={{ margin: '0 auto' }} className="markdown-content">
           {article.content ? (
-            <ReactMarkdown
-              components={{
-                img: ({node, src, alt, ...props}) => {
-                  // Handle internal image URLs
-                  if (src && !src.startsWith('http')) {
-                    src = `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${src}`;
-                  }
-                  return (
-                    <div style={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
-                      <img 
-                        src={src} 
-                        alt={alt} 
-                        style={{
-                          maxWidth: '100%', 
-                          borderRadius: '12px',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
-                        }} 
-                        {...props} 
-                      />
-                    </div>
-                  );
-                },
-                h1: ({node, ...props}) => <h1 style={{fontSize: '2.25rem', fontWeight: 'bold', margin: '2rem 0 1rem', color: '#444'}} {...props} />,
-                h2: ({node, ...props}) => <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', margin: '1.75rem 0 1rem', color: '#444'}} {...props} />,
-                h3: ({node, ...props}) => <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', margin: '1.5rem 0 0.75rem', color: '#444'}} {...props} />,
-                p: ({node, ...props}) => <p style={{margin: '1.25rem 0', lineHeight: '1.7', color: '#444', fontSize: '1.125rem'}} {...props} />,
-                ul: ({node, ...props}) => <ul style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'disc'}} {...props} />,
-                ol: ({node, ...props}) => <ol style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'decimal'}} {...props} />,
-                li: ({node, ...props}) => <li style={{marginBottom: '0.75rem', lineHeight: '1.6', color: '#444'}} {...props} />,
-                a: ({node, ...props}) => <a style={{color: '#E9887E', textDecoration: 'underline'}} {...props} />,
-                strong: ({node, ...props}) => <strong style={{fontWeight: 'bold', color: '#333'}} {...props} />,
-                blockquote: ({node, ...props}) => <blockquote style={{
-                  borderLeft: '4px solid #E9887E',
-                  paddingLeft: '1.5rem',
-                  marginLeft: '0',
-                  marginRight: '0',
-                  marginTop: '1.5rem',
-                  marginBottom: '1.5rem',
-                  fontStyle: 'italic',
-                  color: '#555'
-                }} {...props} />
-              }}
-            >
+            <ReactMarkdown components={components}>
               {article.content}
             </ReactMarkdown>
           ) : (

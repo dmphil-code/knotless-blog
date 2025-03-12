@@ -1,0 +1,30 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+  ignore = "git diff --quiet HEAD^ HEAD -- . ':(exclude)content/'"
+
+[build.environment]
+  # These are placeholder URLs - you'll set the actual values in the Netlify dashboard
+  # Do not put your actual production URLs here
+  NEXT_PUBLIC_STRAPI_API_URL = "https://your-strapi-backend-url.com/api"
+  NEXT_PUBLIC_STRAPI_URL = "https://your-strapi-backend-url.com"
+  NODE_VERSION = "18.17.0"
+  NPM_VERSION = "9.6.7"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# This is important for Next.js SSR and proper routing
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+  
+# Force HTTPS
+[[redirects]]
+  from = "http://*"
+  to = "https://:splat"
+  status = 301
+  force = true
+  
+# Handle SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -79,6 +79,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchArticles();
+    // We need the dependency array empty to avoid re-fetching on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Determine which data to display based on search state
@@ -122,14 +124,14 @@ export default function Home() {
             {isSearching && (
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">
-                  Search results for "{searchQuery}"
+                  Search results for &quot;{searchQuery}&quot;
                 </h2>
                 <p className="text-gray-600">
                   Found {displayedPagination.total} article{displayedPagination.total !== 1 ? 's' : ''}
                 </p>
                 {displayedArticles.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-xl mb-4">No articles found for "{searchQuery}"</p>
+                    <p className="text-xl mb-4">No articles found for &quot;{searchQuery}&quot;</p>
                     <button 
                       onClick={() => {
                         setIsSearching(false);
