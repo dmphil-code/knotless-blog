@@ -96,15 +96,28 @@ export default function Home() {
     
     console.log('Processing article:', article.id, article);
     
+    // Debug the actual thumbnail structure
+    console.log('Thumbnail data:', article.thumbnail);
+    
+    let imageUrl = null;
+    if (article.thumbnail && article.thumbnail.url) {
+      // Check if URL already starts with http (absolute URL)
+      if (article.thumbnail.url.startsWith('http')) {
+        imageUrl = article.thumbnail.url;
+      } else {
+        // Otherwise prepend the Strapi URL
+        imageUrl = `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`;
+      }
+      console.log('Constructed image URL:', imageUrl);
+    }
+  
     return {
       id: article.id,
       slug: article.slug || null,
       title: article.title || 'Untitled Article',
       excerpt: article.excerpt || '',
       content: article.content || '',
-      image: article.thumbnail?.url ? 
-        `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}` : 
-        null
+      image: imageUrl
     };
   };
   
