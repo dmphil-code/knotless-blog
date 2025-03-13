@@ -6,8 +6,8 @@
 [build.environment]
   # These are placeholder URLs - you'll set the actual values in the Netlify dashboard
   # Do not put your actual production URLs here
-  NEXT_PUBLIC_STRAPI_API_URL = "https://your-strapi-backend-url.com/api"
-  NEXT_PUBLIC_STRAPI_URL = "https://your-strapi-backend-url.com"
+  # NEXT_PUBLIC_STRAPI_API_URL = "https://your-strapi-backend-url.com/api"
+  # NEXT_PUBLIC_STRAPI_URL = "https://your-strapi-backend-url.com"
   NODE_VERSION = "18.18.0"
   NPM_VERSION = "9.6.7"
   NEXT_TELEMETRY_DISABLED = "1"

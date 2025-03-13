@@ -5,6 +5,9 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337/api',
 });
 
+// At the top of your API service file
+console.log('API Base URL being used:', process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337/api');
+
 // Get all articles with pagination, sorting, and filtering
 export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:desc', filters = {}) => {
   try {

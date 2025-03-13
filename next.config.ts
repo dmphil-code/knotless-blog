@@ -3,8 +3,8 @@ const nextConfig = {
   images: {
     domains: [
       'localhost',
-      'your-strapi-app.onrender.com',
-      'res.cloudinary.com', // Add Cloudinary domain
+      'https://strapi-project-b3l7.onrender.com',
+      'res.cloudinary.com', 
     ],
   },
   // Add any other configs you need
