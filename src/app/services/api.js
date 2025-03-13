@@ -37,7 +37,7 @@ export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:d
       meta: response.data.meta,
     };
   } catch (error) {
-    console.error('Error fetching articles:', error);
+    console.error('Error fetching articles:', error.response?.data || error.message || error);
     return { data: [], meta: { pagination: { page: 1, pageSize, total: 0 } } };
   }
 };
@@ -56,7 +56,7 @@ export const getArticleById = async (id) => {
     // Return the article data directly, not wrapped in response.data.data
     return response.data || null;
   } catch (error) {
-    console.error('Error fetching article by ID:', error);
+    console.error('Error fetching article by ID:', error.response?.data || error.message || error);
     return null;
   }
 };
@@ -82,7 +82,7 @@ export const getArticleBySlug = async (slug) => {
     // Return the first article directly (not inside attributes)
     return response.data.data[0] || null;
   } catch (error) {
-    console.error('Error fetching article by slug:', error);
+    console.error('Error fetching article by slug:', error.response?.data || error.message || error);
     return null;
   }
 };
@@ -126,7 +126,7 @@ export const searchArticles = async (query, page = 1, pageSize = 10) => {
       meta: response.data.meta,
     };
   } catch (error) {
-    console.error('Error searching articles:', error);
+    console.error('Error searching articles:', error.response?.data || error.message || error);
     return { data: [], meta: { pagination: { page: 1, pageSize, total: 0 } } };
   }
 };
@@ -141,7 +141,7 @@ export const getCategories = async () => {
     });
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    console.error('Error fetching categories:', error.response?.data || error.message || error);
     return [];
   }
 };

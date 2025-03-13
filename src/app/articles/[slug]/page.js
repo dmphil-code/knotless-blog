@@ -194,8 +194,10 @@ export default function ArticleDetail() {
           }}>
             {/* Keep using img tag with ESLint warning suppressed */}
             <img
-              src={`${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`}
-              alt={article.title || 'Article thumbnail'}
+              src={article.thumbnail.url.startsWith('http') 
+                ? article.thumbnail.url 
+                : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`}
+                alt={article.title}
               style={{ 
                 borderRadius: '12px', 
                 maxHeight: '450px', 

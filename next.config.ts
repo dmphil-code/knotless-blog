@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: [
+      'localhost',
+      'your-strapi-app.onrender.com',
+      'res.cloudinary.com', // Add Cloudinary domain
+    ],
+  },
+  // Add any other configs you need
 };
 
-export default nextConfig;
+module.exports = nextConfig;
