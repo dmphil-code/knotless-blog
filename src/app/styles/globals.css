@@ -40,7 +40,8 @@ body {
   background-position: center;
   background-blend-mode: soft-light;
   color: white;
-  min-height: 100vh;
+  max-height: 75vh;
+  /* min-height: 60vh; */
   width: 100%;
 }
 

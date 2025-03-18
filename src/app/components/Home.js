@@ -94,7 +94,6 @@ export default function Home() {
 
   useEffect(() => {
     fetchArticles();
-    // We need the dependency array empty to avoid re-fetching on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -110,8 +109,6 @@ export default function Home() {
     }
     
     console.log('Processing article:', article.id, article);
-    
-    // Debug the actual thumbnail structure
     console.log('Thumbnail data:', article.thumbnail);
     
     let imageUrl = null;
@@ -141,69 +138,83 @@ export default function Home() {
   
   return (
     <Layout onSearchSubmit={onSearchSubmit}>
-      {/* Hero Section - This will be rendered inside the hero container in the Layout */}
+      {/* Hero Section with Featured Articles */}
       {!isSearching && (
         <div className="hero-articles-wrapper" style={{
-          position: 'relative',
-          paddingTop: '40px',
-          paddingBottom: '80px',
-          backgroundColor: '#E9887E', // Salmon color from brand guidelines
-          zIndex: 1
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '70vh',
+          width: '100%',
+          padding: '80px 2rem'
         }}>
           <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '30px',
             maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '0 2rem'
+            width: '100%'
           }}>
-            <h1 style={{ 
-              fontSize: '2.5rem', 
-              fontWeight: 'bold',
-              marginBottom: '2.5rem',
-              color: 'white',
-              textAlign: 'center'
-            }}>
-              Latest from Our Blog
-            </h1>
-            
             {loading ? (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '300px'
-              }}>
-                <p style={{
-                  fontSize: '1.25rem',
-                  color: 'white'
-                }}>Loading featured articles...</p>
-              </div>
-            ) : (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '30px',
-              }}>
-                {featuredArticles.length > 0 ? (
-                  featuredArticles.map((article) => {
-                    const transformedArticle = transformArticleData(article);
-                    if (!transformedArticle) return null;
-                    
-                    return (
-                      <HeroArticleCard 
-                        key={transformedArticle.id} 
-                        article={transformedArticle}
-                      />
-                    );
-                  })
-                ) : (
+              // Loading placeholders for hero cards
+              Array(3).fill().map((_, i) => (
+                <div key={i} style={{
+                  position: 'relative',
+                  height: '400px',
+                  borderRadius: '0',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                  backgroundColor: '#333'
+                }}>
                   <div style={{
-                    gridColumn: 'span 3',
-                    textAlign: 'center',
-                    padding: '2rem 0'
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    width: '100%',
+                    padding: '15px 0',
+                    backgroundColor: 'rgba(233, 136, 126, 0.8)',
+                    textAlign: 'center'
                   }}>
-                    <p style={{ color: 'white' }}>No featured articles available</p>
+                    <span style={{
+                      color: 'white',
+                      fontWeight: '500',
+                      fontSize: '1rem',
+                      letterSpacing: '1px'
+                    }}>
+                      Loading...
+                    </span>
                   </div>
-                )}
+                </div>
+              ))
+            ) : featuredArticles.length > 0 ? (
+              // Map featuredArticles to HeroArticleCard components
+              featuredArticles.map((article) => {
+                const transformedArticle = transformArticleData(article);
+                if (!transformedArticle) return null;
+                
+                return (
+                  <div key={article.id} style={{
+                    position: 'relative',
+                    height: '400px',
+                    borderRadius: '0',
+                    overflow: 'hidden',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                  }}>
+                    <HeroArticleCard 
+                      article={transformedArticle}
+                      darkTheme={true}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              // No featured articles available
+              <div style={{
+                gridColumn: 'span 3',
+                textAlign: 'center',
+                padding: '2rem 0'
+              }}>
+                <p style={{ color: 'white' }}>No featured articles available</p>
               </div>
             )}
           </div>

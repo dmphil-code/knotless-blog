@@ -252,7 +252,7 @@ export default function Layout({ children, title, description, onSearchSubmit })
           color: 'white',
           position: 'relative',
           width: '100%',
-          padding: '100px 0 80px',
+          padding: '116px 0 80px',
           marginTop: '0'
         }}>
           {children}

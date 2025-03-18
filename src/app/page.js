@@ -147,29 +147,6 @@ export default function Home() {
       {/* Hero Section with Featured Articles */}
       {!isSearching && (
         <>
-          {/* Blog Title Section */}
-          <div style={{
-            textAlign: 'center',
-            padding: '20px 0 40px'
-          }}>
-            {/* <h1 style={{ 
-              fontSize: '2.5rem', 
-              fontWeight: 'bold',
-              marginBottom: '1rem',
-              color: 'white'
-            }}>
-              Latest from Our Blog
-            </h1>
-            <p style={{
-              fontSize: '1.1rem',
-              maxWidth: '600px',
-              margin: '0 auto',
-              color: 'rgba(255, 255, 255, 0.9)'
-            }}>
-              Discover the latest trends, tips, and stories in hair care and styling
-            </p> */}
-          </div>
-          
           {/* Featured Articles Grid */}
           <div style={{
             maxWidth: '1200px',
