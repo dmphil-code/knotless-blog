@@ -1,0 +1,84 @@
+.articleCardContainer {
+    height: 400px;
+    width: 100%;
+  }
+  
+  .articleCard {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .articleCardImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  
+  .articleThumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .articlePlaceholder {
+    width: 100%;
+    height: 100%;
+    background-color: #333;
+  }
+  
+  .articleOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.076);
+    z-index: 2;
+  } 
+  
+  .articleDate {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 0.875rem;
+    color: white;
+    z-index: 3;
+  }
+  
+  .articleTitleArea {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    z-index: 3;
+  }
+  
+  .articleTitle {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: 1px;
+    color: white;
+  }
+  
+  .articleDivider {
+    width: 100%;
+    height: 1px;
+    background-color: white;
+    margin: 10px 0;
+  }
+  
+  .articleAuthor {
+    font-size: 1rem;
+    margin: 0;
+    color: white;
+  }
