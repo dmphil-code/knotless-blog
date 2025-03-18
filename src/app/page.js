@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getArticles, searchArticles } from './services/api';
 import ArticleCard from './components/ArticleCard';
+import HeroArticleCard from './components/HeroArticleCard';
 import Pagination from './components/Pagination';
 import Layout from './components/Layout';
 
@@ -93,7 +94,6 @@ export default function Home() {
 
   useEffect(() => {
     fetchArticles();
-    // We need the dependency array empty to avoid re-fetching on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -101,7 +101,7 @@ export default function Home() {
   const displayedArticles = isSearching ? searchResults : articles;
   const displayedPagination = isSearching ? searchPagination : pagination;
   
-  // Function to transform article data for display
+  // Function to transform article data for ArticleCard
   const transformArticleData = (article) => {
     if (!article) {
       console.warn('Invalid article data:', article);
@@ -132,189 +132,95 @@ export default function Home() {
     };
   };
   
-  // Format date for display
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-  
   return (
     <Layout onSearchSubmit={onSearchSubmit}>
-      {/* Hero Section with Featured Articles */}
+      {/* Hero Section with Featured Articles - Only show when not searching */}
       {!isSearching && (
-        <>
-          {/* Featured Articles Grid */}
+        <div className="hero-articles-wrapper" style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '70vh',
+          width: '100%',
+          padding: '80px 2rem'
+        }}>
           <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '30px',
             maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '0 2rem'
+            width: '100%'
           }}>
             {loading ? (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '300px'
-              }}>
-                <p style={{
-                  fontSize: '1.25rem',
-                  color: 'white'
-                }}>Loading featured articles...</p>
-              </div>
-            ) : (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '30px',
-              }}>
-                {featuredArticles.length > 0 ? (
-                  featuredArticles.map((article) => {
-                    const transformedArticle = transformArticleData(article);
-                    if (!transformedArticle) return null;
-                    
-                    // Construct the article link path
-                    const linkPath = transformedArticle.slug 
-                      ? `/articles/${transformedArticle.slug}` 
-                      : `/articles/${transformedArticle.id}`;
-                    
-                    return (
-                      <div key={transformedArticle.id} style={{
-                        position: 'relative',
-                        height: '400px',
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-                        transition: 'transform 0.3s ease',
-                      }}>
-                        {/* Article Image */}
-                        <div style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          zIndex: 1,
-                        }}>
-                          {transformedArticle.image ? (
-                            <img 
-                              src={transformedArticle.image} 
-                              alt={transformedArticle.title}
-                              style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'cover'
-                              }}
-                            />
-                          ) : (
-                            <div style={{
-                              width: '100%',
-                              height: '100%',
-                              background: 'linear-gradient(to right, #F4B637, #E9887E)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}></div>
-                          )}
-                          
-                          {/* Dark overlay for better text visibility */}
-                          <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)',
-                            zIndex: 2
-                          }}></div>
-                        </div>
-                        
-                        {/* Article Title Box - Hovering over the image */}
-                        <div style={{
-                          position: 'absolute',
-                          bottom: '30px',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: '80%',
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          padding: '20px',
-                          borderRadius: '6px',
-                          boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                          zIndex: 3,
-                          textAlign: 'center'
-                        }}>
-                          {/* Category if available */}
-                          {transformedArticle.categories && transformedArticle.categories.length > 0 && (
-                            <span style={{
-                              color: '#E9887E',
-                              fontSize: '0.85rem',
-                              fontWeight: '500',
-                              marginBottom: '8px',
-                              display: 'block'
-                            }}>
-                              {transformedArticle.categories[0].name}
-                            </span>
-                          )}
-                          
-                          {/* Article Title */}
-                          <h2 style={{
-                            fontSize: '1.2rem',
-                            fontWeight: 'bold',
-                            marginBottom: '10px',
-                            color: '#333',
-                            lineHeight: 1.3
-                          }}>
-                            {transformedArticle.title}
-                          </h2>
-                          
-                          {/* Date if available */}
-                          {transformedArticle.publishDate && (
-                            <p style={{
-                              fontSize: '0.85rem',
-                              color: '#666',
-                              margin: '0'
-                            }}>
-                              {formatDate(transformedArticle.publishDate)}
-                            </p>
-                          )}
-                        </div>
-                        
-                        {/* Clickable Link Overlay */}
-                        <Link 
-                          href={linkPath}
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            zIndex: 4,
-                            cursor: 'pointer'
-                          }}
-                          aria-label={`Read article: ${transformedArticle.title}`}
-                        />
-                      </div>
-                    );
-                  })
-                ) : (
+              // Loading placeholders for hero cards
+              Array(3).fill().map((_, i) => (
+                <div key={i} style={{
+                  position: 'relative',
+                  height: '400px',
+                  borderRadius: '0',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                  backgroundColor: '#333'
+                }}>
                   <div style={{
-                    gridColumn: 'span 3',
-                    textAlign: 'center',
-                    padding: '2rem 0'
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    width: '100%',
+                    padding: '15px 0',
+                    backgroundColor: 'rgba(233, 136, 126, 0.8)',
+                    textAlign: 'center'
                   }}>
-                    <p style={{ color: 'white' }}>No featured articles available</p>
+                    <span style={{
+                      color: 'white',
+                      fontWeight: '500',
+                      fontSize: '1rem',
+                      letterSpacing: '1px'
+                    }}>
+                      Loading...
+                    </span>
                   </div>
-                )}
+                </div>
+              ))
+            ) : featuredArticles.length > 0 ? (
+              // Map featuredArticles to HeroArticleCard components
+              featuredArticles.map((article) => {
+                const transformedArticle = transformArticleData(article);
+                if (!transformedArticle) return null;
+                
+                return (
+                  <div key={article.id} style={{
+                    position: 'relative',
+                    height: '400px',
+                    borderRadius: '0',
+                    overflow: 'hidden',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <HeroArticleCard 
+                      article={transformedArticle}
+                      darkTheme={true}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              // No featured articles available
+              <div style={{
+                gridColumn: 'span 3',
+                textAlign: 'center',
+                padding: '2rem 0'
+              }}>
+                <p style={{ color: 'white' }}>No featured articles available</p>
               </div>
             )}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Main Content Section with Article Grid */}
+      {/* Main Content Section */}
       <div style={{ 
         maxWidth: '1200px',
         margin: '0 auto',
@@ -408,8 +314,6 @@ export default function Home() {
               {displayedArticles.map((article) => {
                 const transformedArticle = transformArticleData(article);
                 if (!transformedArticle) return null;
-                
-                // Use the ArticleCard component for the grid display
                 return (
                   <ArticleCard 
                     key={article.id} 

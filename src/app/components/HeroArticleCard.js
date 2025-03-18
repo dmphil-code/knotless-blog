@@ -12,11 +12,6 @@ export default function HeroArticleCard({ article, darkTheme = false }) {
         day: 'numeric'
       })
     : '';
-
-  // Get first category if available
-  const firstCategory = article.categories && article.categories.length > 0
-    ? article.categories[0]
-    : null;
   
   return (
     <div style={{
@@ -62,44 +57,54 @@ export default function HeroArticleCard({ article, darkTheme = false }) {
           </div>
         )}
         
-        {/* Title bar at bottom with semitransparent background */}
+        {/* Dark overlay for better text visibility */}
         <div style={{
           position: 'absolute',
-          bottom: 0,
+          top: 0,
           left: 0,
           width: '100%',
-          padding: '15px',
-          backgroundColor: 'rgba(233, 136, 126, 0.8)',
-          textAlign: 'center',
-          zIndex: 2
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.4)', // Dark overlay
+          zIndex: 1
+        }}></div>
+        
+        {/* Title box - centered on image */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '80%',
+          backgroundColor: 'white', // Fully opaque
+          padding: '25px',
+          borderRadius: '6px',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+          zIndex: 2,
+          textAlign: 'center'
         }}>
+          {/* Article Title */}
           <h3 style={{
             margin: 0,
-            color: darkTheme ? 'white' : '#333',
-            fontWeight: '500',
-            fontSize: '1rem',
-            letterSpacing: '1px'
+            marginBottom: '10px',
+            color: '#333',
+            fontWeight: 'bold',
+            fontSize: '1.4rem',
+            lineHeight: 1.3
           }}>
             {article.title}
           </h3>
+          
+          {/* Date if available */}
+          {formattedDate && (
+            <p style={{
+              fontSize: '0.9rem',
+              color: '#666',
+              margin: 0
+            }}>
+              {formattedDate}
+            </p>
+          )}
         </div>
-        
-        {/* Optional: Category tag if available */}
-        {firstCategory && (
-          <div style={{
-            position: 'absolute',
-            top: '15px',
-            right: '15px',
-            backgroundColor: 'rgba(233, 136, 126, 0.8)',
-            color: darkTheme ? 'white' : '#333',
-            padding: '5px 10px',
-            fontSize: '0.8rem',
-            fontWeight: '500',
-            zIndex: 2
-          }}>
-            {firstCategory.name}
-          </div>
-        )}
       </div>
       
       {/* Clickable overlay */}

@@ -255,7 +255,7 @@ export default function Layout({ children, title, description, onSearchSubmit })
           padding: '116px 0 80px',
           marginTop: '0'
         }}>
-          {children}
+          {children.length > 0 && children[0]}
         </div>
       )}
 
@@ -285,6 +285,7 @@ export default function Layout({ children, title, description, onSearchSubmit })
         {!title && (
           <div className="non-hero-content" style={{ position: 'relative' }}>
             {/* Show only non-hero children in the main content area */}
+            {children.length > 1 ? children.slice(1) : null}
           </div>
         )}
       </main>
