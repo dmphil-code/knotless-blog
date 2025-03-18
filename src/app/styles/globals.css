@@ -41,7 +41,6 @@ body {
   background-blend-mode: soft-light;
   color: white;
   max-height: 75vh;
-  /* min-height: 60vh; */
   width: 100%;
 }
 
@@ -50,7 +49,10 @@ body {
   background-color: transparent;
   padding: 1.5rem 0;
   width: 100%;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: absolute; /* Position it over the hero section */
+  z-index: 10; /* Ensure it appears above the hero background */
+  border-bottom: none; /* Remove the border if present */
+
 }
 
 .header-container {
@@ -160,14 +162,15 @@ body {
   border-bottom: none;
 }
 
-/* Hero Articles Section */
+/* Hero Articles Section - UPDATED FOR VERTICAL CENTERING */
 .hero-articles-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   min-height: 70vh;
   width: 100%;
   padding: 80px 2rem;
+  background-color: transparent; /* Remove the solid color */
 }
 
 .hero-articles-grid {
@@ -176,12 +179,15 @@ body {
   gap: 30px;
   max-width: 1200px;
   width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Hero Article Card */
+/* Hero Article Card - UPDATED DESIGN */
 .hero-article-card {
   position: relative;
   height: 400px;
+  width: 100%;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -204,35 +210,73 @@ body {
   transform: scale(1.05);
 }
 
-.hero-article-title-bar {
+/* Updated title box - centered with only title, no date */
+.hero-article-title-box {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 15px;
-  background-color: rgba(233, 136, 126, 0.8);
-  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  background-color: white;
+  padding: 25px;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   z-index: 2;
+  text-align: center;
 }
 
 .hero-article-title {
   margin: 0;
-  color: white;
-  font-weight: 500;
-  font-size: 1rem;
-  letter-spacing: 1px;
+  color: #333;
+  font-weight: bold;
+  font-size: 1.4rem;
+  line-height: 1.3;
 }
 
-.hero-article-category {
+/* New READ MORE button at bottom */
+.hero-read-more {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background-color: rgba(233, 136, 126, 0.8);
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #E9887E;
   color: white;
-  padding: 5px 10px;
-  font-size: 0.8rem;
+  padding: 12px 25px;
+  z-index: 3;
+  text-align: center;
   font-weight: 500;
-  z-index: 2;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+/* Dark overlay for article images */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+/* Hero card container */
+.hero-card-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-card-container:hover .hero-read-more {
+  background-color: #d47068;
 }
 
 /* Search bar (hidden but preserved) */
@@ -701,8 +745,8 @@ footer {
 }
 
 .py-8 {
-  /* padding-top: 2rem;
-  padding-bottom: 2rem; */
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .mb-8 {
@@ -740,7 +784,8 @@ footer {
     font-size: 1.75rem;
   }
   
-  .hero-article-card {
+  .hero-article-card,
+  .hero-card-container {
     height: 350px;
   }
 }
@@ -785,7 +830,8 @@ footer {
     padding: 60px 1rem;
   }
   
-  .hero-article-card {
+  .hero-article-card,
+  .hero-card-container {
     height: 300px;
   }
   

@@ -248,7 +248,10 @@ export default function Layout({ children, title, description, onSearchSubmit })
       {/* Hero Section Container */}
       {!title && (
         <div className="hero-container" style={{
-          backgroundColor: '#E9887E',
+          backgroundImage: "url('/images/hero-background.webp')",  // Replace with your image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundColor: 'transparent',
           color: 'white',
           position: 'relative',
           width: '100%',

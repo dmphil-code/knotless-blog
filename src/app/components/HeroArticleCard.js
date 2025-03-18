@@ -1,25 +1,13 @@
+// src/app/components/HeroArticleCard.js
+
 import Link from 'next/link';
 
 export default function HeroArticleCard({ article, darkTheme = false }) {
   // Use ID as fallback if slug is not available
   const linkPath = article.slug ? `/articles/${article.slug}` : `/articles/${article.id}`;
   
-  // Format date if available
-  const formattedDate = article.publishDate 
-    ? new Date(article.publishDate).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    : '';
-  
   return (
-    <div style={{
-      position: 'relative',
-      height: '100%',
-      width: '100%',
-      overflow: 'hidden',
-    }}>
+    <div className="hero-article-card">
       {/* Image background */}
       <div style={{
         position: 'absolute',
@@ -37,8 +25,7 @@ export default function HeroArticleCard({ article, darkTheme = false }) {
               width: '100%', 
               height: '100%', 
               objectFit: 'cover',
-              objectPosition: 'center',
-              transition: 'transform 0.5s ease'
+              objectPosition: 'center'
             }}
           />
         ) : (
@@ -58,52 +45,19 @@ export default function HeroArticleCard({ article, darkTheme = false }) {
         )}
         
         {/* Dark overlay for better text visibility */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: 'rgba(0, 0, 0, 0.4)', // Dark overlay
-          zIndex: 1
-        }}></div>
+        <div className="hero-overlay"></div>
         
         {/* Title box - centered on image */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '80%',
-          backgroundColor: 'white', // Fully opaque
-          padding: '25px',
-          borderRadius: '6px',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-          zIndex: 2,
-          textAlign: 'center'
-        }}>
+        <div className="hero-article-title-box">
           {/* Article Title */}
-          <h3 style={{
-            margin: 0,
-            marginBottom: '10px',
-            color: '#333',
-            fontWeight: 'bold',
-            fontSize: '1.4rem',
-            lineHeight: 1.3
-          }}>
+          <h3 className="hero-article-title">
             {article.title}
           </h3>
-          
-          {/* Date if available */}
-          {formattedDate && (
-            <p style={{
-              fontSize: '0.9rem',
-              color: '#666',
-              margin: 0
-            }}>
-              {formattedDate}
-            </p>
-          )}
+        </div>
+        
+        {/* READ MORE button at bottom */}
+        <div className="hero-read-more">
+          READ MORE
         </div>
       </div>
       
@@ -114,7 +68,7 @@ export default function HeroArticleCard({ article, darkTheme = false }) {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: 3,
+        zIndex: 4,
         cursor: 'pointer',
         textDecoration: 'none'
       }} aria-label={`Read article: ${article.title}`}>

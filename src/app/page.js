@@ -136,49 +136,26 @@ export default function Home() {
     <Layout onSearchSubmit={onSearchSubmit}>
       {/* Hero Section with Featured Articles - Only show when not searching */}
       {!isSearching && (
-        <div className="hero-articles-wrapper" style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '70vh',
-          width: '100%',
-          padding: '80px 2rem'
-        }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '30px',
-            maxWidth: '1200px',
-            width: '100%'
-          }}>
+        <div className="hero-articles-wrapper">
+          <div className="hero-articles-grid">
             {loading ? (
               // Loading placeholders for hero cards
               Array(3).fill().map((_, i) => (
-                <div key={i} style={{
-                  position: 'relative',
-                  height: '400px',
-                  borderRadius: '0',
-                  overflow: 'hidden',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                  backgroundColor: '#333'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    width: '100%',
-                    padding: '15px 0',
-                    backgroundColor: 'rgba(233, 136, 126, 0.8)',
-                    textAlign: 'center'
-                  }}>
-                    <span style={{
-                      color: 'white',
-                      fontWeight: '500',
-                      fontSize: '1rem',
-                      letterSpacing: '1px'
+                <div key={i} className="hero-card-container">
+                  <div className="hero-article-card">
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#333',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}>
-                      Loading...
-                    </span>
+                      <div className="hero-overlay"></div>
+                      <div className="hero-read-more">
+                        LOADING...
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))
@@ -189,16 +166,7 @@ export default function Home() {
                 if (!transformedArticle) return null;
                 
                 return (
-                  <div key={article.id} style={{
-                    position: 'relative',
-                    height: '400px',
-                    borderRadius: '0',
-                    overflow: 'hidden',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
+                  <div key={article.id} className="hero-card-container">
                     <HeroArticleCard 
                       article={transformedArticle}
                       darkTheme={true}
@@ -211,16 +179,20 @@ export default function Home() {
               <div style={{
                 gridColumn: 'span 3',
                 textAlign: 'center',
-                padding: '2rem 0'
+                padding: '2rem 0',
+                height: '400px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <p style={{ color: 'white' }}>No featured articles available</p>
               </div>
             )}
           </div>
         </div>
-      )}
+      )}      
 
-      {/* Main Content Section */}
+  {/* Main Content Section */}
       <div style={{ 
         maxWidth: '1200px',
         margin: '0 auto',
