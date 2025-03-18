@@ -247,17 +247,7 @@ export default function Layout({ children, title, description, onSearchSubmit })
 
       {/* Hero Section Container */}
       {!title && (
-        <div className="hero-container" style={{
-          backgroundImage: "url('/images/hero-background.webp')",  // Replace with your image path
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundColor: 'transparent',
-          color: 'white',
-          position: 'relative',
-          width: '100%',
-          padding: '116px 0 80px',
-          marginTop: '0'
-        }}>
+        <div className="hero-container">
           {children.length > 0 && children[0]}
         </div>
       )}
@@ -265,7 +255,7 @@ export default function Layout({ children, title, description, onSearchSubmit })
       {/* Main Content */}
       <main className="main-content" style={{ 
         backgroundColor: 'white',
-        paddingTop: '2rem'
+        paddingTop: title ? '2rem' : 0
       }}>
         {title && (
           <div style={{ padding: '2rem 1rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>

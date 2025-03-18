@@ -35,13 +35,20 @@ body {
 .hero-container {
   position: relative;
   background-color: #222;
-  background-image: url('/images/dark-texture-bg.jpg');
+  background-image: url('/images/hero-background.webp');
   background-size: cover;
   background-position: center;
   background-blend-mode: soft-light;
   color: white;
-  max-height: 75vh;
+  min-height: 75vh;
+  max-height: 85vh; /* Added a max-height to prevent excessive height */
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 80px; /* Space for the header */
+  overflow: hidden; /* Prevent content from spilling outside */
 }
 
 /* Header Styles */
@@ -52,7 +59,6 @@ body {
   position: absolute; /* Position it over the hero section */
   z-index: 10; /* Ensure it appears above the hero background */
   border-bottom: none; /* Remove the border if present */
-
 }
 
 .header-container {
@@ -162,15 +168,15 @@ body {
   border-bottom: none;
 }
 
-/* Hero Articles Section - UPDATED FOR VERTICAL CENTERING */
+/* Hero Articles Section - UPDATED FOR PROPER CONTAINMENT */
 .hero-articles-wrapper {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  min-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  padding: 80px 2rem;
-  background-color: transparent; /* Remove the solid color */
+  height: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 .hero-articles-grid {
@@ -179,8 +185,6 @@ body {
   gap: 30px;
   max-width: 1200px;
   width: 100%;
-  align-items: center;
-  justify-content: center;
 }
 
 /* Hero Article Card - UPDATED DESIGN */
@@ -252,7 +256,7 @@ body {
 }
 
 /* Dark overlay for article images */
-.hero-overlay {
+/* .hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -260,7 +264,7 @@ body {
   height: 100%;
   background: rgba(0, 0, 0, 0.4);
   z-index: 1;
-}
+} */
 
 /* Hero card container */
 .hero-card-container {
@@ -321,7 +325,6 @@ body {
 /* Main content */
 .main-content {
   background-color: white;
-  padding-top: 3rem;
 }
 
 .section-title {
@@ -545,10 +548,6 @@ footer {
 
 .footer-link:hover {
   color: var(--primary);
-}
-
-.footer-social {
-  margin-bottom: 2rem;
 }
 
 .social-links {
@@ -833,6 +832,11 @@ footer {
   .hero-article-card,
   .hero-card-container {
     height: 300px;
+  }
+  
+  .hero-container {
+    min-height: auto;
+    padding: 100px 0 40px;
   }
   
   .footer-content {
