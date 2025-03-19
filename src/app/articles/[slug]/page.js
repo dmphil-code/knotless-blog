@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { getArticleBySlug, getArticleById } from '../../services/api';
-import Layout from '../../components/Layout';
+import ArticleLayout from '../../components/ArticleLayout';
 import ReactMarkdown from 'react-markdown';
 
 export default function ArticleDetail() {
@@ -54,17 +53,17 @@ export default function ArticleDetail() {
 
   if (loading) {
     return (
-      <Layout>
+      <ArticleLayout>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
           <p style={{ fontSize: '1.25rem', color: '#666' }}>Loading article...</p>
         </div>
-      </Layout>
+      </ArticleLayout>
     );
   }
 
   if (error || !article) {
     return (
-      <Layout>
+      <ArticleLayout>
         <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#E9887E' }}>
             Article Not Found
@@ -83,7 +82,7 @@ export default function ArticleDetail() {
             Return to Homepage
           </Link>
         </div>
-      </Layout>
+      </ArticleLayout>
     );
   }
 
@@ -141,7 +140,7 @@ export default function ArticleDetail() {
   };
 
   return (
-    <Layout>
+    <ArticleLayout>
       <article style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
         {/* Back link positioned above the main title */}
         <Link 
@@ -192,7 +191,6 @@ export default function ArticleDetail() {
             display: 'flex', 
             justifyContent: 'center' 
           }}>
-            {/* Keep using img tag with ESLint warning suppressed */}
             <img
               src={article.thumbnail.url.startsWith('http') 
                 ? article.thumbnail.url 
@@ -259,6 +257,6 @@ export default function ArticleDetail() {
           </div>
         )}
       </article>
-    </Layout>
+    </ArticleLayout>
   );
 }

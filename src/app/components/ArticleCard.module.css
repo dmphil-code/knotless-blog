@@ -10,6 +10,14 @@
     overflow: hidden;
     color: white;
     cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .articleCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
   
   .articleCardImage {
@@ -18,14 +26,18 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0;
+    z-index: 1;
   }
   
   .articleThumbnail {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    transition: transform 0.5s ease;
+  }
+  
+  .articleCard:hover .articleThumbnail {
+    transform: scale(1.05);
   }
   
   .articlePlaceholder {
@@ -40,9 +52,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1;
-  }
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
+    z-index: 2;
+  } 
   
   .articleDate {
     position: absolute;
@@ -50,7 +62,8 @@
     left: 20px;
     font-size: 0.875rem;
     color: white;
-    z-index: 2;
+    z-index: 3;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   }
   
   .articleTitleArea {
@@ -59,27 +72,31 @@
     left: 0;
     width: 100%;
     padding: 20px;
-    z-index: 2;
+    z-index: 3;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    padding-top: 60px;
   }
   
   .articleTitle {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.3;
     letter-spacing: 1px;
     color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   }
   
   .articleDivider {
-    width: 100%;
-    height: 1px;
-    background-color: white;
-    margin: 10px 0;
+    width: 60px;
+    height: 2px;
+    background-color: #E9887E;
+    margin: 12px 0;
   }
   
   .articleAuthor {
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 0;
-    color: white;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
   }

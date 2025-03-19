@@ -6,7 +6,7 @@ import { getArticles, searchArticles } from './services/api';
 import ArticleCard from './components/ArticleCard';
 import HeroArticleCard from './components/HeroArticleCard';
 import Pagination from './components/Pagination';
-import Layout from './components/Layout';
+import HomeLayout from './components/HomeLayout';
 
 export default function Home() {
   const [articles, setArticles] = useState([]);
@@ -133,7 +133,7 @@ export default function Home() {
   };
   
   return (
-    <Layout onSearchSubmit={onSearchSubmit}>
+    <HomeLayout onSearchSubmit={onSearchSubmit}>
       {/* Hero Section with Featured Articles - Only show when not searching */}
       {!isSearching && (
         <div className="hero-articles-wrapper">
@@ -192,7 +192,7 @@ export default function Home() {
         </div>
       )}      
 
-  {/* Main Content Section */}
+      {/* Main Content Section */}
       <div style={{ 
         maxWidth: '1200px',
         margin: '0 auto',
@@ -326,6 +326,6 @@ export default function Home() {
           </div>
         )}
       </div>
-    </Layout>
+    </HomeLayout>
   );
 }
