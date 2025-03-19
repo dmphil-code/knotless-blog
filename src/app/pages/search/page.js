@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { searchArticles } from '../services/api';
-import ArticleCard from '../components/ArticleCard';
-import Pagination from '../components/Pagination';
+import { searchArticles } from '../../services/api';
+import ArticleCard from '../../components/ArticleCard';
+import Pagination from '../../components/Pagination';
 import Layout from '../components/Layout';
 
 export default function Search() {
