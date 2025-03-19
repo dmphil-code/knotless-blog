@@ -114,7 +114,7 @@ export default function BaseLayout({
             }}>
               About
             </Link>
-            <Link href="https://knotless.bookerhq.ca/stylists" className="nav-link" style={{
+            <Link href="https://knotless.bookerhq.ca/" className="nav-link" style={{
               marginRight: '1.5rem',
               textDecoration: 'none',
               color: getTextColor(),
@@ -176,34 +176,38 @@ export default function BaseLayout({
           <div className="auth-buttons" style={{
             display: 'flex',
             alignItems: 'center'
-          }}>
-            <button style={{
-              background: 'transparent',
-              color: getTextColor(),
-              padding: '0.5rem 1.25rem',
-              borderRadius: '2rem',
-              border: `1px solid ${getTextColor()}`,
-              marginRight: '0.75rem',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}>
-              Log In
-            </button>
-            <button style={{
-              background: 'transparent',
-              color: getTextColor(),
-              padding: '0.5rem 1.25rem',
-              borderRadius: '2rem',
-              border: `1px solid ${getTextColor()}`,
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}>
-              Join
-            </button>
+          }}> 
+            <Link href="https://knotless.bookerhq.ca/login" style={{ marginRight: '0.75rem' }}>
+              <button style={{
+                background: 'transparent',
+                color: getTextColor(),
+                padding: '0.5rem 1.25rem',
+                borderRadius: '2rem',
+                border: `1px solid ${getTextColor()}`,
+                marginRight: '0.75rem',
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}>
+                Log In
+              </button>
+            </Link>
+            <Link href="https://knotless.bookerhq.ca/login">
+              <button style={{
+                background: 'transparent',
+                color: getTextColor(),
+                padding: '0.5rem 1.25rem',
+                borderRadius: '2rem',
+                border: `1px solid ${getTextColor()}`,
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}>
+                Join
+              </button>
+            </Link>
           </div>
           
           {/* Mobile Menu Button - Hidden on desktop */}
@@ -343,11 +347,12 @@ export default function BaseLayout({
             flexWrap: 'wrap',
             marginBottom: '2rem'
           }}>
+            {/* Brand Section (Left) */}
             <div style={{
               marginBottom: '2rem',
               maxWidth: '400px'
             }}>
-              <Link href="/" style={{
+              <Link href="https://knotless.bookerhq.ca/" style={{
                 textDecoration: 'none',
                 fontSize: '1.75rem',
                 fontWeight: 'bold',
@@ -355,7 +360,14 @@ export default function BaseLayout({
                 display: 'block',
                 marginBottom: '1rem'
               }}>
-                Knotless
+                    <img 
+                    src="/images/main-logo.png" 
+                    alt="Knotless Logo" 
+                    style={{
+                      maxWidth: '200px', // Adjust the size as needed
+                      height: 'auto'
+                    }}
+                  />
               </Link>
               <p style={{ 
                 color: '#666',
@@ -366,6 +378,7 @@ export default function BaseLayout({
               </p>
             </div>
             
+            {/* Quick Links Section */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -389,7 +402,7 @@ export default function BaseLayout({
                 color: '#666',
                 fontSize: '0.95rem'
               }}>About</Link>
-              <Link href="https://knotless.bookerhq.ca/stylists" style={{
+              <Link href="https://knotless.bookerhq.ca/" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: '#666',
@@ -408,6 +421,38 @@ export default function BaseLayout({
               }}>Contact Us</Link>
             </div>
             
+            {/* Terms Section (New) */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              marginBottom: '2rem'
+            }}>
+              <h3 style={{
+                marginBottom: '1rem',
+                fontSize: '1.2rem',
+                fontWeight: '600',
+                color: '#333'
+              }}>Terms</h3>
+              <Link href="https://knotless.bookerhq.ca/PrivacyPolicy" style={{
+                marginBottom: '0.5rem',
+                textDecoration: 'none',
+                color: '#666',
+                fontSize: '0.95rem'
+              }}>Privacy Policy</Link>
+              <Link href="https://knotless.bookerhq.ca/TermsOfService" style={{
+                marginBottom: '0.5rem',
+                textDecoration: 'none',
+                color: '#666',
+                fontSize: '0.95rem'
+              }}>Terms of Service</Link>
+              <Link href="/" style={{
+                textDecoration: 'none',
+                color: '#666',
+                fontSize: '0.95rem'
+              }}>Land Acknowledgement</Link>
+            </div>
+            
+            {/* Follow Us Section (Vertical) */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -419,35 +464,33 @@ export default function BaseLayout({
                 fontWeight: '600',
                 color: '#333'
               }}>Follow Us</h3>
-              <div style={{
-                display: 'flex',
-                gap: '1rem'
+              <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer" style={{
+                textDecoration: 'none',
+                color: '#666',
+                fontSize: '0.95rem',
+                marginBottom: '0.5rem'
               }}>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" style={{
-                  textDecoration: 'none',
-                  color: '#666',
-                  fontSize: '0.95rem'
-                }}>
-                  Twitter
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{
-                  textDecoration: 'none',
-                  color: '#666',
-                  fontSize: '0.95rem'
-                }}>
-                  Instagram
-                </a>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={{
-                  textDecoration: 'none',
-                  color: '#666',
-                  fontSize: '0.95rem'
-                }}>
-                  Facebook
-                </a>
-              </div>
+                Twitter
+              </Link>
+              <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{
+                textDecoration: 'none',
+                color: '#666',
+                fontSize: '0.95rem',
+                marginBottom: '0.5rem'
+              }}>
+                Instagram
+              </Link>
+              <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={{
+                textDecoration: 'none',
+                color: '#666',
+                fontSize: '0.95rem'
+              }}>
+                Facebook
+              </Link>
             </div>
           </div>
           
+          {/* Copyright Section */}
           <div style={{
             borderTop: '1px solid #ddd',
             paddingTop: '1.5rem',
@@ -458,7 +501,7 @@ export default function BaseLayout({
             </p>
           </div>
         </div>
-      </footer>
-    </div>
+      </footer>   
+</div>
   );
 }
