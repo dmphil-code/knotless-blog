@@ -51,7 +51,7 @@ export default function HeroArticleCard({ article, darkTheme = false }) {
         <div className="hero-article-title-box">
           {/* Article Title */}
           <h3 className="hero-article-title">
-            {article.title}
+            {article.title.toUpperCase()}
           </h3>
         </div>
         
