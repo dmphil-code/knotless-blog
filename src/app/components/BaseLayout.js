@@ -73,7 +73,7 @@ export default function BaseLayout({
       {/* Sticky Header */}
       <header className="site-header" style={{
         backgroundColor: getHeaderBgColor(),
-        padding: '1rem 0',
+        padding: '1.25rem 0 1.75rem',
         position: 'fixed',
         top: 0,
         left: 0,
@@ -147,14 +147,17 @@ export default function BaseLayout({
             textAlign: 'center',
             position: 'absolute',
             left: '50%',
-            transform: 'translateX(-50%)'
+            top: '50%', // Position in center vertically
+            transform: 'translate(-50%, -60%)', // Offset upward slightly
+            paddingTop: '0.75rem'
           }}>
             <Link href="/" className="logo" style={{
               textDecoration: 'none',
               fontSize: '2rem',
               fontWeight: 'bold',
               color: getLogoColor(),
-              display: 'block'
+              display: 'block',
+              lineHeight: '1' // Tighter line height
             }}>
               Knotless
             </Link>
@@ -163,7 +166,7 @@ export default function BaseLayout({
               color: getSubtitleColor(),
               letterSpacing: '2px',
               textTransform: 'uppercase',
-              marginTop: '0.25rem'
+              lineHeight: '2' // Tighter line height
             }}>
               detangling beauty
             </p>

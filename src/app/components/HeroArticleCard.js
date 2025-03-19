@@ -47,13 +47,10 @@ export default function HeroArticleCard({ article, darkTheme = false }) {
         {/* Dark overlay for better text visibility */}
         <div className="hero-overlay"></div>
         
-        {/* Title box - centered on image */}
-        <div className="hero-article-title-box">
-          {/* Article Title */}
-          <h3 className="hero-article-title">
-            {article.title.toUpperCase()}
-          </h3>
-        </div>
+        {/* Article Title - now directly on the image without container */}
+        <h3 className="hero-article-title">
+          {article.title.toUpperCase()}
+        </h3>
         
         {/* READ MORE button at bottom */}
         <div className="hero-read-more">
