@@ -6,12 +6,14 @@ import { useParams } from 'next/navigation';
 import { getArticleBySlug, getArticleById } from '../../services/api';
 import ArticleLayout from '../../components/ArticleLayout';
 import ReactMarkdown from 'react-markdown';
+import useWindowSize from '../../hooks/useWindowSize';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const windowSize = useWindowSize();
   
   // Check if slug is a number (ID) or string (slug)
   const isId = !isNaN(Number(slug));
@@ -141,7 +143,11 @@ export default function ArticleDetail() {
 
   return (
     <ArticleLayout>
-      <article style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
+      <article style={{ 
+        maxWidth: '800px', 
+        margin: '0 auto', 
+        padding: '0 1rem' 
+      }}>
         {/* Back link positioned above the main title */}
         <Link 
           href="/" 
@@ -155,10 +161,10 @@ export default function ArticleDetail() {
         >
           ← Back to all articles
         </Link>
-
+  
         {/* Single main title */}
         <h1 style={{ 
-          fontSize: '2.5rem', 
+          fontSize: windowSize.width < 768 ? '1.75rem' : '2.5rem', 
           fontWeight: 'bold', 
           marginBottom: '1.5rem', 
           textAlign: 'center',
@@ -166,7 +172,7 @@ export default function ArticleDetail() {
         }}>
           {article.title}
         </h1>
-
+  
         {/* Author and date stacked vertically */}
         <div style={{ 
           display: 'flex', 
@@ -183,7 +189,7 @@ export default function ArticleDetail() {
           )}
           <span style={{ color: '#777' }}>{publishDate}</span>
         </div>
-
+  
         {/* Centered thumbnail image */}
         {article.thumbnail && article.thumbnail.url && (
           <div style={{ 
@@ -198,7 +204,7 @@ export default function ArticleDetail() {
                 alt={article.title}
               style={{ 
                 borderRadius: '12px', 
-                maxHeight: '450px', 
+                maxHeight: windowSize.width < 768 ? '300px' : '450px', 
                 maxWidth: '100%',
                 objectFit: 'cover',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
@@ -206,18 +212,61 @@ export default function ArticleDetail() {
             />
           </div>
         )}
-
+  
         {/* Article content with proper styling - Using content field */}
         <div style={{ margin: '0 auto' }} className="markdown-content">
           {article.content ? (
-            <ReactMarkdown components={components}>
+            <ReactMarkdown components={{
+              ...components,
+              // Override some components for responsive design
+              h1: ({ children }) => (
+                <h1 style={{
+                  fontSize: windowSize.width < 768 ? '1.75rem' : '2.25rem', 
+                  fontWeight: 'bold', 
+                  margin: '2rem 0 1rem', 
+                  color: '#444'
+                }}>
+                  {children}
+                </h1>
+              ),
+              h2: ({ children }) => (
+                <h2 style={{
+                  fontSize: windowSize.width < 768 ? '1.5rem' : '1.875rem', 
+                  fontWeight: 'bold', 
+                  margin: '1.75rem 0 1rem', 
+                  color: '#444'
+                }}>
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 style={{
+                  fontSize: windowSize.width < 768 ? '1.25rem' : '1.5rem', 
+                  fontWeight: 'bold', 
+                  margin: '1.5rem 0 0.75rem', 
+                  color: '#444'
+                }}>
+                  {children}
+                </h3>
+              ),
+              p: ({ children }) => (
+                <p style={{
+                  margin: '1.25rem 0', 
+                  lineHeight: '1.7', 
+                  color: '#444', 
+                  fontSize: windowSize.width < 768 ? '1rem' : '1.125rem'
+                }}>
+                  {children}
+                </p>
+              ),
+            }}>
               {article.content}
             </ReactMarkdown>
           ) : (
             <p>No content available for this article.</p>
           )}
         </div>
-
+  
         {/* Categories */}
         {article.categories && article.categories.length > 0 && (
           <div style={{ 
@@ -243,9 +292,9 @@ export default function ArticleDetail() {
                   style={{ 
                     backgroundColor: '#FFE8C9', 
                     color: '#773800',
-                    padding: '0.5rem 1rem', 
+                    padding: windowSize.width < 480 ? '0.4rem 0.8rem' : '0.5rem 1rem', 
                     borderRadius: '2rem', 
-                    fontSize: '0.875rem',
+                    fontSize: windowSize.width < 480 ? '0.8rem' : '0.875rem',
                     textDecoration: 'none',
                     fontWeight: '500'
                   }}

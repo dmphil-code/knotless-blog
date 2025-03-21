@@ -1,11 +1,18 @@
+import { useEffect, useState } from 'react';
+import useWindowSize from '../hooks/useWindowSize';
+
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
+  const windowSize = useWindowSize();
+  const isMobile = windowSize.width < 768;
+  
   // Don't show pagination if there's only one page
   if (totalPages <= 1) return null;
 
   // Create an array of page numbers
   const getPageNumbers = () => {
     const pageNumbers = [];
-    const maxPagesToShow = 5;
+    // On mobile, show fewer pages
+    const maxPagesToShow = isMobile ? 3 : 5;
     
     if (totalPages <= maxPagesToShow) {
       // If we have fewer pages than our max, show all pages
@@ -14,7 +21,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
       }
     } else {
       // Otherwise, show a window of pages around the current page
-      let startPage = Math.max(1, currentPage - 2);
+      let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
       let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
       
       // Adjust start page if needed
@@ -26,14 +33,18 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
         pageNumbers.push(i);
       }
       
-      // Add ellipsis if needed
+      // Add ellipsis if needed - on mobile show fewer indicators
       if (startPage > 1) {
-        pageNumbers.unshift('...');
+        if (startPage > 2 && !isMobile) {
+          pageNumbers.unshift('...');
+        }
         pageNumbers.unshift(1);
       }
       
       if (endPage < totalPages) {
-        pageNumbers.push('...');
+        if (endPage < totalPages - 1 && !isMobile) {
+          pageNumbers.push('...');
+        }
         pageNumbers.push(totalPages);
       }
     }
@@ -42,15 +53,32 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
   };
 
   return (
-    <div className="pagination">
+    <div className="pagination" style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: isMobile ? '5px' : '10px',
+      margin: '40px 0 20px',
+      flexWrap: 'wrap'
+    }}>
       {/* Previous button */}
       <button 
         className="pagination-button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        style={{ opacity: currentPage === 1 ? 0.5 : 1 }}
+        style={{ 
+          padding: isMobile ? '6px 12px' : '8px 16px',
+          border: '1px solid #ddd',
+          backgroundColor: 'white',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          color: '#444',
+          fontFamily: 'Montserrat, sans-serif',
+          fontSize: isMobile ? '0.8rem' : '0.9rem',
+          opacity: currentPage === 1 ? 0.5 : 1
+        }}
       >
-        &lt; Prev
+        {isMobile ? '<' : '< Prev'}
       </button>
       
       {/* Page numbers */}
@@ -60,6 +88,17 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
           className={`pagination-button ${page === currentPage ? 'active' : ''}`}
           onClick={() => typeof page === 'number' && onPageChange(page)}
           disabled={typeof page !== 'number'}
+          style={{
+            padding: isMobile ? '6px 10px' : '8px 16px',
+            border: '1px solid #ddd',
+            backgroundColor: page === currentPage ? '#E9887E' : 'white',
+            color: page === currentPage ? 'white' : '#444',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: isMobile ? '0.8rem' : '0.9rem',
+            borderColor: page === currentPage ? '#E9887E' : '#ddd'
+          }}
         >
           {page}
         </button>
@@ -70,9 +109,19 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
         className="pagination-button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        style={{ opacity: currentPage === totalPages ? 0.5 : 1 }}
+        style={{
+          padding: isMobile ? '6px 12px' : '8px 16px',
+          border: '1px solid #ddd',
+          backgroundColor: 'white',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          color: '#444',
+          fontFamily: 'Montserrat, sans-serif',
+          fontSize: isMobile ? '0.8rem' : '0.9rem',
+          opacity: currentPage === totalPages ? 0.5 : 1
+        }}
       >
-        Next &gt;
+        {isMobile ? '>' : 'Next >'}
       </button>
     </div>
   );

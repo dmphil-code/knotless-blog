@@ -7,8 +7,10 @@ import ArticleCard from './components/ArticleCard';
 import HeroArticleCard from './components/HeroArticleCard';
 import Pagination from './components/Pagination';
 import HomeLayout from './components/HomeLayout';
+import useWindowSize from './hooks/useWindowSize';
 
 export default function Home() {
+  const windowSize = useWindowSize();
   const [articles, setArticles] = useState([]);
   const [featuredArticles, setFeaturedArticles] = useState([]);
   const [pagination, setPagination] = useState({
@@ -137,10 +139,20 @@ export default function Home() {
       {/* Hero Section with Featured Articles - Only show when not searching */}
       {!isSearching && (
         <div className="hero-articles-wrapper">
-          <div className="hero-articles-grid">
+          <div className="hero-articles-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: windowSize.width < 768 
+              ? '1fr' 
+              : windowSize.width < 1024 
+                ? 'repeat(2, 1fr)' 
+                : 'repeat(3, 1fr)',
+            gap: '30px',
+            maxWidth: '1200px',
+            width: '100%'
+          }}>
             {loading ? (
               // Loading placeholders for hero cards
-              Array(3).fill().map((_, i) => (
+              Array(windowSize.width < 768 ? 1 : windowSize.width < 1024 ? 2 : 3).fill().map((_, i) => (
                 <div key={i} className="hero-card-container">
                   <div className="hero-article-card">
                     <div style={{
@@ -161,7 +173,8 @@ export default function Home() {
               ))
             ) : featuredArticles.length > 0 ? (
               // Map featuredArticles to HeroArticleCard components
-              featuredArticles.map((article) => {
+              // For mobile, only show the first article
+              featuredArticles.slice(0, windowSize.width < 768 ? 1 : windowSize.width < 1024 ? 2 : 3).map((article) => {
                 const transformedArticle = transformArticleData(article);
                 if (!transformedArticle) return null;
                 
@@ -177,10 +190,10 @@ export default function Home() {
             ) : (
               // No featured articles available
               <div style={{
-                gridColumn: 'span 3',
+                gridColumn: windowSize.width < 768 ? 'span 1' : windowSize.width < 1024 ? 'span 2' : 'span 3',
                 textAlign: 'center',
                 padding: '2rem 0',
-                height: '400px',
+                height: '300px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -190,8 +203,8 @@ export default function Home() {
             )}
           </div>
         </div>
-      )}      
-
+      )}
+      
       {/* Main Content Section */}
       <div style={{ 
         maxWidth: '1200px',
@@ -240,91 +253,100 @@ export default function Home() {
           </div>
         )}
 
-        {!isSearching && (
-          <h2 style={{ 
-            fontSize: '2rem', 
-            fontWeight: 'bold',
-            marginBottom: '2.5rem',
-            color: '#333',
-            textAlign: 'center'
-          }}>
-            Explore More Articles
-          </h2>
-        )}
+      {!isSearching && (
+        <h2 style={{ 
+          fontSize: windowSize.width < 768 ? '1.75rem' : '2rem', 
+          fontWeight: 'bold',
+          marginBottom: '2.5rem',
+          color: '#333',
+          textAlign: 'center'
+        }}>
+          Explore More Articles
+        </h2>
+      )}
 
-        {loading && !isSearching ? (
-          <div style={{
+      {loading && !isSearching ? (
+        <div className="articles-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: windowSize.width < 768 
+            ? '1fr' 
+            : windowSize.width < 1024 
+              ? 'repeat(2, 1fr)' 
+              : 'repeat(3, 1fr)',
+          gap: '30px'
+        }}>
+          {/* Loading placeholders */}
+          {Array(6).fill().map((_, i) => (
+            <div key={i} style={{
+              borderRadius: '8px',
+              overflow: 'hidden',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              backgroundColor: '#f5f5f5',
+              height: windowSize.width < 768 ? '300px' : '350px'
+            }}>
+              <div style={{ height: '200px', backgroundColor: '#eee' }}></div>
+              <div style={{ padding: '20px' }}>
+                <div style={{ height: '24px', backgroundColor: '#ddd', marginBottom: '15px', width: '80%' }}></div>
+                <div style={{ height: '16px', backgroundColor: '#ddd', marginBottom: '8px', width: '100%' }}></div>
+                <div style={{ height: '16px', backgroundColor: '#ddd', marginBottom: '15px', width: '70%' }}></div>
+                <div style={{ height: '30px', backgroundColor: '#ddd', width: '40%' }}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        displayedArticles.length > 0 ? (
+          <div className="articles-grid" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: windowSize.width < 768 
+              ? '1fr' 
+              : windowSize.width < 1024 
+                ? 'repeat(2, 1fr)' 
+                : 'repeat(3, 1fr)',
             gap: '30px'
           }}>
-            {Array(6).fill().map((_, i) => (
-              <div key={i} style={{
-                borderRadius: '8px',
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                backgroundColor: '#f5f5f5',
-                height: '350px'
-              }}>
-                <div style={{ height: '200px', backgroundColor: '#eee' }}></div>
-                <div style={{ padding: '20px' }}>
-                  <div style={{ height: '24px', backgroundColor: '#ddd', marginBottom: '15px', width: '80%' }}></div>
-                  <div style={{ height: '16px', backgroundColor: '#ddd', marginBottom: '8px', width: '100%' }}></div>
-                  <div style={{ height: '16px', backgroundColor: '#ddd', marginBottom: '15px', width: '70%' }}></div>
-                  <div style={{ height: '30px', backgroundColor: '#ddd', width: '40%' }}></div>
-                </div>
-              </div>
-            ))}
+            {displayedArticles.map((article) => {
+              const transformedArticle = transformArticleData(article);
+              if (!transformedArticle) return null;
+              return (
+                <ArticleCard 
+                  key={article.id} 
+                  article={transformedArticle} 
+                />
+              );
+            })}
           </div>
-        ) : (
-          displayedArticles.length > 0 ? (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '30px'
+        ) : !isSearching && (
+          <div style={{
+            textAlign: 'center',
+            padding: '3rem 0'
+          }}>
+            <p style={{
+              fontSize: '1.25rem',
+              color: '#666',
+              marginBottom: '1.5rem'
             }}>
-              {displayedArticles.map((article) => {
-                const transformedArticle = transformArticleData(article);
-                if (!transformedArticle) return null;
-                return (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={transformedArticle} 
-                  />
-                );
-              })}
-            </div>
-          ) : !isSearching && (
-            <div style={{
-              textAlign: 'center',
-              padding: '3rem 0'
+              No articles available at the moment.
+            </p>
+            <p style={{
+              fontSize: '1rem',
+              color: '#888'
             }}>
-              <p style={{
-                fontSize: '1.25rem',
-                color: '#666',
-                marginBottom: '1.5rem'
-              }}>
-                No articles available at the moment.
-              </p>
-              <p style={{
-                fontSize: '1rem',
-                color: '#888'
-              }}>
-                Please check back later for new content.
-              </p>
-            </div>
-          )
-        )}
+              Please check back later for new content.
+            </p>
+          </div>
+        )
+      )}
 
-        {displayedArticles.length > 0 && displayedPagination.total > displayedPagination.pageSize && (
-          <div style={{ marginTop: '3rem' }}>
-            <Pagination
-              currentPage={displayedPagination.page}
-              totalPages={Math.ceil(displayedPagination.total / displayedPagination.pageSize)}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        )}
+      {displayedArticles.length > 0 && displayedPagination.total > displayedPagination.pageSize && (
+        <div style={{ marginTop: '3rem' }}>
+          <Pagination
+            currentPage={displayedPagination.page}
+            totalPages={Math.ceil(displayedPagination.total / displayedPagination.pageSize)}
+            onPageChange={handlePageChange}
+          />
+        </div>
+        )}      
       </div>
     </HomeLayout>
   );

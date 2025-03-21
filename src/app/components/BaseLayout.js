@@ -34,6 +34,13 @@ export default function BaseLayout({
     };
   }, []);
 
+  // If window size changes from mobile to desktop, close mobile menu
+  useEffect(() => {
+    if (windowSize.width >= 768 && isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [windowSize.width, isMobileMenuOpen]);
+
   // Calculate responsive padding values based on window size
   const getTopPadding = () => {
     const width = windowSize.width || 0;
@@ -107,23 +114,23 @@ export default function BaseLayout({
         <div className="logo" style={{ display: 'flex', alignItems: 'center' }}>
           <Link href="/" style={{ display: 'block' }}>
             <img 
-              src="/images/main-logo.png"
+              src="/images/main-logo1.png"
               alt="Knotless Logo" 
               style={{
-                height: '65px', // Enlarged logo height
+                height: '65px',
                 width: 'auto',
-                objectFit: 'contain' // Helps maintain quality when resizing
+                objectFit: 'contain'
               }}
             />
           </Link>
         </div>
         
-        {/* Navigation Links - Positioned closer to logo */}
+        {/* Navigation Links - Only visible on non-mobile screens */}
         <nav className="nav-links" style={{ 
-          display: 'flex',
+          display: windowSize.width >= 768 ? 'flex' : 'none',
           alignItems: 'center',
           flex: 1,
-          marginLeft: '64px', // Specific spacing from logo as requested
+          marginLeft: '64px',
         }}>
           <Link href="https://knotless.bookerhq.ca/home" className="nav-link" style={{
             margin: '0 1.25rem',
@@ -132,7 +139,7 @@ export default function BaseLayout({
             fontWeight: '400',
             fontSize: '14px',
             fontFamily: 'Montserrat, sans-serif',
-            textTransform: 'capitalize' // Ensures proper case
+            textTransform: 'capitalize'
           }}>
             Home
           </Link>
@@ -182,6 +189,45 @@ export default function BaseLayout({
           </Link>
         </nav>
         
+        {/* Mobile Menu Button - Only visible on mobile screens */}
+        {windowSize.width < 768 && (
+          <button 
+            onClick={toggleMobileMenu}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px',
+              marginRight: '1rem'
+            }}
+          >
+            <div style={{
+              width: '24px',
+              height: '2px',
+              backgroundColor: '#333',
+              marginBottom: '5px',
+              transition: 'transform 0.3s ease',
+              transform: isMobileMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
+            }} />
+            <div style={{
+              width: '24px',
+              height: '2px',
+              backgroundColor: '#333',
+              marginBottom: '5px',
+              opacity: isMobileMenuOpen ? 0 : 1,
+              transition: 'opacity 0.3s ease'
+            }} />
+            <div style={{
+              width: '24px',
+              height: '2px',
+              backgroundColor: '#333',
+              transition: 'transform 0.3s ease',
+              transform: isMobileMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
+            }} />
+          </button>
+        )}
+        
         {/* Auth Buttons - Updated with elevation and rounded corners */}
         <div className="auth-buttons" style={{
           display: 'flex',
@@ -192,7 +238,7 @@ export default function BaseLayout({
               background: '#F4B637', // Yellow color
               color: '#333',
               padding: '0 1.25rem',
-              borderRadius: '24px', // Rounded corners as requested
+              borderRadius: '24px',
               border: 'none',
               height: '40px',
               fontSize: '14px',
@@ -200,7 +246,7 @@ export default function BaseLayout({
               fontFamily: 'Montserrat, sans-serif',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Elevation 1
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
               textTransform: 'capitalize'
             }}>
               Log In
@@ -208,10 +254,10 @@ export default function BaseLayout({
           </Link>
           <Link href="https://knotless.bookerhq.ca/signup">
             <button style={{
-              background: '#E9887E', // Pink color
+              background: '#E9887E',
               color: 'white',
               padding: '0 1.25rem',
-              borderRadius: '24px', // Rounded corners as requested
+              borderRadius: '24px',
               border: 'none',
               height: '40px',
               fontSize: '14px',
@@ -219,68 +265,78 @@ export default function BaseLayout({
               fontFamily: 'Montserrat, sans-serif',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Elevation 1
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
               textTransform: 'capitalize'
             }}>
               Join
             </button>
-          </Link>        
-
-        {/* Mobile Navigation - Only visible when menu is open on small screens */}
-        {isMobileMenuOpen && (
-          <nav className="mobile-nav" style={{
-            padding: '1rem',
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            display: 'none' // This would be shown with media queries in CSS
-          }}>
-            <Link href="https://knotless.bookerhq.ca/home" className="mobile-nav-link" style={{
-              display: 'block',
-              padding: '0.75rem 0',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              textDecoration: 'none'
-            }}>
-              Home
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/aboutUs" className="mobile-nav-link" style={{
-              display: 'block',
-              padding: '0.75rem 0',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              textDecoration: 'none'
-            }}>
-              About
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/stylists" className="mobile-nav-link" style={{
-              display: 'block',
-              padding: '0.75rem 0',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              textDecoration: 'none'
-            }}>
-              Stylists
-            </Link>
-            <Link href="/" className="mobile-nav-link" style={{
-              display: 'block',
-              padding: '0.75rem 0',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              textDecoration: 'none'
-            }}>
-              Blog
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/contactUs" className="mobile-nav-link" style={{
-              display: 'block',
-              padding: '0.75rem 0',
-              color: 'white',
-              textDecoration: 'none'
-            }}>
-              Contact Us
-            </Link>
-          </nav>
-        )}
-      </div>
+          </Link>
+        </div>
       </header>
+
+      {/* Mobile Navigation - Appears below header when menu is open */}
+      {isMobileMenuOpen && (
+        <div className="mobile-nav active" style={{
+          padding: '1rem',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          position: 'fixed',
+          top: '80px',
+          left: 0,
+          width: '100%',
+          zIndex: 99,
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+        }}>
+          <Link href="https://knotless.bookerhq.ca/home" className="mobile-nav-link" style={{
+            display: 'block',
+            padding: '0.75rem 0',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            textDecoration: 'none',
+            textAlign: 'center'
+          }}>
+            Home
+          </Link>
+          <Link href="https://knotless.bookerhq.ca/aboutUs" className="mobile-nav-link" style={{
+            display: 'block',
+            padding: '0.75rem 0',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            textDecoration: 'none',
+            textAlign: 'center'
+          }}>
+            About
+          </Link>
+          <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" className="mobile-nav-link" style={{
+            display: 'block',
+            padding: '0.75rem 0',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            textDecoration: 'none',
+            textAlign: 'center'
+          }}>
+            Stylists
+          </Link>
+          <Link href="/" className="mobile-nav-link" style={{
+            display: 'block',
+            padding: '0.75rem 0',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            textDecoration: 'none',
+            textAlign: 'center'
+          }}>
+            Blog
+          </Link>
+          <Link href="https://knotless.bookerhq.ca/contactUs" className="mobile-nav-link" style={{
+            display: 'block',
+            padding: '0.75rem 0',
+            color: 'white',
+            textDecoration: 'none',
+            textAlign: 'center'
+          }}>
+            Contact Us
+          </Link>
+        </div>
+      )}
   
       {/* Main Content */}
       {pageType === 'home' ? (
@@ -304,18 +360,25 @@ export default function BaseLayout({
         /* Regular Content for Other Pages */
         <main style={{ 
           backgroundColor: 'white',
-          paddingTop: getTopPadding(), // Extra padding for article pages
+          paddingTop: getTopPadding(),
           minHeight: '70vh'
         }}>
           {title && (
             <div style={{ padding: '2rem 1rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
-              <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>{title}</h1>
+              <h1 style={{ 
+                fontSize: windowSize.width < 768 ? '2rem' : '2.5rem', 
+                marginBottom: '1rem', 
+                fontWeight: 'bold', 
+                textAlign: 'center' 
+              }}>
+                {title}
+              </h1>
               {description && (
                 <p style={{ 
                   marginBottom: '2rem', 
                   color: '#666', 
                   textAlign: 'center',
-                  fontSize: '1.25rem'
+                  fontSize: windowSize.width < 768 ? '1rem' : '1.25rem'
                 }}>
                   {description}
                 </p>
@@ -326,7 +389,7 @@ export default function BaseLayout({
         </main>
       )}
 
-      {/* Footer */}
+      {/* Footer with responsive adjustments */}
       <footer style={{
         backgroundColor: '#F5F5F5',
         padding: '3rem 0',
@@ -346,7 +409,9 @@ export default function BaseLayout({
             {/* Brand Section (Left) */}
             <div style={{
               marginBottom: '2rem',
-              maxWidth: '400px'
+              maxWidth: '400px',
+              width: windowSize.width < 768 ? '100%' : 'auto',
+              textAlign: windowSize.width < 768 ? 'center' : 'left'
             }}>
               <Link href="https://knotless.bookerhq.ca/" style={{
                 textDecoration: 'none',
@@ -356,14 +421,15 @@ export default function BaseLayout({
                 display: 'block',
                 marginBottom: '1rem'
               }}>
-                    <img 
-                    src="/images/main-logo.png" 
-                    alt="Knotless Logo" 
-                    style={{
-                      maxWidth: '200px', // Adjust the size as needed
-                      height: 'auto'
-                    }}
-                  />
+                <img 
+                  src="/images/main-logo1.png" 
+                  alt="Knotless Logo" 
+                  style={{
+                    maxWidth: '200px',
+                    height: 'auto',
+                    margin: windowSize.width < 768 ? '0 auto' : '0'
+                  }}
+                />
               </Link>
               <p style={{ 
                 color: '#666',
@@ -378,7 +444,9 @@ export default function BaseLayout({
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              marginBottom: '2rem'
+              marginBottom: '2rem',
+              width: windowSize.width < 768 ? '100%' : 'auto',
+              textAlign: windowSize.width < 768 ? 'center' : 'left'
             }}>
               <h3 style={{
                 marginBottom: '1rem',
@@ -417,11 +485,13 @@ export default function BaseLayout({
               }}>Contact Us</Link>
             </div>
             
-            {/* Terms Section (New) */}
+            {/* Terms Section */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              marginBottom: '2rem'
+              marginBottom: '2rem',
+              width: windowSize.width < 768 ? '100%' : 'auto',
+              textAlign: windowSize.width < 768 ? 'center' : 'left'
             }}>
               <h3 style={{
                 marginBottom: '1rem',
@@ -448,11 +518,13 @@ export default function BaseLayout({
               }}>Land Acknowledgement</Link>
             </div>
             
-            {/* Follow Us Section (Vertical) */}
+            {/* Follow Us Section */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              marginBottom: '2rem'
+              marginBottom: '2rem',
+              width: windowSize.width < 768 ? '100%' : 'auto',
+              textAlign: windowSize.width < 768 ? 'center' : 'left'
             }}>
               <h3 style={{
                 marginBottom: '1rem',
@@ -498,6 +570,6 @@ export default function BaseLayout({
           </div>
         </div>
       </footer>   
-</div>
+    </div>
   );
 }
