@@ -136,7 +136,7 @@ export default function BaseLayout({
             margin: '0 1.25rem',
             textDecoration: 'none',
             color: '#333',
-            fontWeight: '400',
+            // fontWeight: '400',
             fontSize: '14px',
             fontFamily: 'Montserrat, sans-serif',
             textTransform: 'capitalize'
@@ -147,7 +147,7 @@ export default function BaseLayout({
             margin: '0 1.25rem',
             textDecoration: 'none',
             color: '#333',
-            fontWeight: '400',
+            // fontWeight: '400',
             fontSize: '14px',
             fontFamily: 'Montserrat, sans-serif',
             textTransform: 'capitalize'
@@ -158,7 +158,7 @@ export default function BaseLayout({
             margin: '0 1.25rem',
             textDecoration: 'none',
             color: '#333',
-            fontWeight: '400',
+            // fontWeight: '400',
             fontSize: '14px',
             fontFamily: 'Montserrat, sans-serif',
             textTransform: 'capitalize'
@@ -169,7 +169,7 @@ export default function BaseLayout({
             margin: '0 1.25rem',
             textDecoration: 'none',
             color: '#333',
-            fontWeight: '400',
+            // fontWeight: '400',
             fontSize: '14px',
             fontFamily: 'Montserrat, sans-serif',
             textTransform: 'capitalize'
@@ -180,7 +180,7 @@ export default function BaseLayout({
             margin: '0 1.25rem',
             textDecoration: 'none',
             color: '#333',
-            fontWeight: '400',
+            // fontWeight: '400',
             fontSize: '14px',
             fontFamily: 'Montserrat, sans-serif',
             textTransform: 'capitalize'

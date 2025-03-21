@@ -5,6 +5,98 @@
   box-sizing: border-box;
 }
 
+/* Bauhaus Soft Display Font Family */
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-Regular.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-Regular.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-Light.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-Light.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-ExtraLight.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-ExtraLight.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-ExtraLight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-Medium.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-Medium.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-SemiBold.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-SemiBold.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-Bold.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-Bold.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-ExtraBold.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-ExtraBold.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-ExtraBold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-Black.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-Black.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bauhaus Soft Display';
+  src: url('/fonts/BauhausSoftDisplay2.0-Thin.woff2') format('woff2'),
+       url('/fonts/BauhausSoftDisplay2.0-Thin.woff') format('woff'),
+       url('/fonts/BauhausSoftDisplay2.0-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 :root {
   /* Brand colors from the style guide */
   --primary: #E9887E;
@@ -14,6 +106,11 @@
   --dark: #773800;
   --text-dark: #222222;
   --text-light: #FFFFFF;
+
+  /* Font families */
+  --font-bauhaus: 'Bauhaus Soft Display', sans-serif;
+  --font-montserrat: 'Montserrat', Arial, sans-serif;
+
 }
 
 body {
@@ -100,13 +197,14 @@ body {
 /* Navigation Links */
 .nav-links {
   display: flex;
+  font-weight: 400;
 }
 
 .nav-link {
   margin-right: 1.5rem;
   text-decoration: none;
   color: white;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 1px;
