@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import useWindowSize from '../hooks/useWindowSize'; 
 
 export default function BaseLayout({ 
   children, 
@@ -13,6 +14,7 @@ export default function BaseLayout({
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const windowSize = useWindowSize();
   
   // Determine if the layout should use dark mode (for hero section)
   const isDarkMode = pageType === 'home' && !isScrolled;
@@ -31,6 +33,23 @@ export default function BaseLayout({
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Calculate responsive padding values based on window size
+  const getTopPadding = () => {
+    const width = windowSize.width || 0;
+    
+    if (pageType === 'article') {
+      if (width >= 1440) return '160px';      // Extra large screens - article
+      if (width >= 1024) return '140px';      // Large screens - article
+      if (width >= 768) return '120px';       // Medium screens - article
+      return '110px';                         // Small screens - article
+    } else {
+      if (width >= 1440) return '140px';      // Extra large screens - other pages
+      if (width >= 1024) return '120px';      // Large screens - other pages
+      if (width >= 768) return '100px';       // Medium screens - other pages
+      return '90px';                          // Small screens - other pages
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -72,165 +91,141 @@ export default function BaseLayout({
     <div style={{ fontFamily: 'Montserrat, sans-serif' }}>
       {/* Sticky Header */}
       <header className="site-header" style={{
-        backgroundColor: getHeaderBgColor(),
-        padding: '1.25rem 0 1.75rem',
+        backgroundColor: '#f5f5f5', // Light gray background
+        padding: '0.75rem 2rem',
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
         zIndex: 100,
-        transition: 'background-color 0.3s ease',
-        boxShadow: isScrolled ? '0 2px 10px rgba(0,0,0,0.1)' : (pageType === 'home' ? 'none' : '0 1px 3px rgba(0,0,0,0.05)')
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
       }}>
-        <div className="header-container" style={{
-          width: '100%',
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '0 2rem',
+        {/* Logo - Left aligned, enlarged */}
+        <div className="logo" style={{ display: 'flex', alignItems: 'center' }}>
+          <Link href="/" style={{ display: 'block' }}>
+            <img 
+              src="/images/main-logo.png"
+              alt="Knotless Logo" 
+              style={{
+                height: '65px', // Enlarged logo height
+                width: 'auto',
+                objectFit: 'contain' // Helps maintain quality when resizing
+              }}
+            />
+          </Link>
+        </div>
+        
+        {/* Navigation Links - Positioned closer to logo */}
+        <nav className="nav-links" style={{ 
           display: 'flex',
-          justifyContent: 'space-between',
+          alignItems: 'center',
+          flex: 1,
+          marginLeft: '64px', // Specific spacing from logo as requested
+        }}>
+          <Link href="https://knotless.bookerhq.ca/home" className="nav-link" style={{
+            margin: '0 1.25rem',
+            textDecoration: 'none',
+            color: '#333',
+            fontWeight: '400',
+            fontSize: '14px',
+            fontFamily: 'Montserrat, sans-serif',
+            textTransform: 'capitalize' // Ensures proper case
+          }}>
+            Home
+          </Link>
+          <Link href="https://knotless.bookerhq.ca/aboutUs" className="nav-link" style={{
+            margin: '0 1.25rem',
+            textDecoration: 'none',
+            color: '#333',
+            fontWeight: '400',
+            fontSize: '14px',
+            fontFamily: 'Montserrat, sans-serif',
+            textTransform: 'capitalize'
+          }}>
+            About
+          </Link>
+          <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" className="nav-link" style={{
+            margin: '0 1.25rem',
+            textDecoration: 'none',
+            color: '#333',
+            fontWeight: '400',
+            fontSize: '14px',
+            fontFamily: 'Montserrat, sans-serif',
+            textTransform: 'capitalize'
+          }}>
+            Stylists
+          </Link>
+          <Link href="/" className="nav-link" style={{
+            margin: '0 1.25rem',
+            textDecoration: 'none',
+            color: '#333',
+            fontWeight: '400',
+            fontSize: '14px',
+            fontFamily: 'Montserrat, sans-serif',
+            textTransform: 'capitalize'
+          }}>
+            Blog
+          </Link>
+          <Link href="https://knotless.bookerhq.ca/contactUs" className="nav-link" style={{
+            margin: '0 1.25rem',
+            textDecoration: 'none',
+            color: '#333',
+            fontWeight: '400',
+            fontSize: '14px',
+            fontFamily: 'Montserrat, sans-serif',
+            textTransform: 'capitalize'
+          }}>
+            Contact Us
+          </Link>
+        </nav>
+        
+        {/* Auth Buttons - Updated with elevation and rounded corners */}
+        <div className="auth-buttons" style={{
+          display: 'flex',
           alignItems: 'center'
         }}>
-          {/* Navigation Links - Left aligned */}
-          <nav className="nav-links" style={{ 
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            <Link href="https://knotless.bookerhq.ca/home" className="nav-link" style={{
-              marginRight: '1.5rem',
-              textDecoration: 'none',
-              color: getTextColor(),
-              fontWeight: '500',
-              fontSize: '0.95rem'
-            }}>
-              Home
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/aboutUs" className="nav-link" style={{
-              marginRight: '1.5rem',
-              textDecoration: 'none',
-              color: getTextColor(),
-              fontWeight: '500',
-              fontSize: '0.95rem'
-            }}>
-              About
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/" className="nav-link" style={{
-              marginRight: '1.5rem',
-              textDecoration: 'none',
-              color: getTextColor(),
-              fontWeight: '500',
-              fontSize: '0.95rem'
-            }}>
-              Stylists
-            </Link>
-            <Link href="/" className="nav-link" style={{
-              marginRight: '1.5rem',
-              textDecoration: 'none',
-              color: getTextColor(),
-              fontWeight: '500',
-              fontSize: '0.95rem'
-            }}>
-              Blog
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/contactUs" className="nav-link" style={{
-              textDecoration: 'none',
-              color: getTextColor(),
-              fontWeight: '500',
-              fontSize: '0.95rem'
-            }}>
-              Contact
-            </Link>
-          </nav>
-          
-          {/* Logo - Center aligned */}
-          <div className="logo-container" style={{ 
-            textAlign: 'center',
-            position: 'absolute',
-            left: '50%',
-            top: '50%', // Position in center vertically
-            transform: 'translate(-50%, -60%)', // Offset upward slightly
-            paddingTop: '0.75rem'
-          }}>
-            <Link href="/" className="logo" style={{
-              textDecoration: 'none',
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              color: getLogoColor(),
-              display: 'block',
-              lineHeight: '1' // Tighter line height
-            }}>
-              Knotless
-            </Link>
-            <p style={{ 
-              fontSize: '0.8rem', 
-              color: getSubtitleColor(),
-              letterSpacing: '2px',
-              textTransform: 'uppercase',
-              lineHeight: '2' // Tighter line height
-            }}>
-              detangling beauty
-            </p>
-          </div>
-
-          {/* Login Buttons - Right aligned */}
-          <div className="auth-buttons" style={{
-            display: 'flex',
-            alignItems: 'center'
-          }}> 
-            <Link href="https://knotless.bookerhq.ca/login" style={{ marginRight: '0.75rem' }}>
-              <button style={{
-                background: 'transparent',
-                color: getTextColor(),
-                padding: '0.5rem 1.25rem',
-                borderRadius: '2rem',
-                border: `1px solid ${getTextColor()}`,
-                marginRight: '0.75rem',
-                fontSize: '0.9rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}>
-                Log In
-              </button>
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/login">
-              <button style={{
-                background: 'transparent',
-                color: getTextColor(),
-                padding: '0.5rem 1.25rem',
-                borderRadius: '2rem',
-                border: `1px solid ${getTextColor()}`,
-                fontSize: '0.9rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}>
-                Join
-              </button>
-            </Link>
-          </div>
-          
-          {/* Mobile Menu Button - Hidden on desktop */}
-          <button
-            onClick={toggleMobileMenu}
-            className="mobile-menu-button"
-            style={{
-              display: 'none', // Would be controlled by media query in CSS
-              background: 'none',
+          <Link href="https://knotless.bookerhq.ca/login" style={{ marginRight: '0.75rem' }}>
+            <button style={{
+              background: '#F4B637', // Yellow color
+              color: '#333',
+              padding: '0 1.25rem',
+              borderRadius: '24px', // Rounded corners as requested
               border: 'none',
+              height: '40px',
+              fontSize: '14px',
+              fontWeight: '400',
+              fontFamily: 'Montserrat, sans-serif',
               cursor: 'pointer',
-              padding: '8px',
-              color: getTextColor()
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-          
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Elevation 1
+              textTransform: 'capitalize'
+            }}>
+              Log In
+            </button>
+          </Link>
+          <Link href="https://knotless.bookerhq.ca/signup">
+            <button style={{
+              background: '#E9887E', // Pink color
+              color: 'white',
+              padding: '0 1.25rem',
+              borderRadius: '24px', // Rounded corners as requested
+              border: 'none',
+              height: '40px',
+              fontSize: '14px',
+              fontWeight: '400',
+              fontFamily: 'Montserrat, sans-serif',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Elevation 1
+              textTransform: 'capitalize'
+            }}>
+              Join
+            </button>
+          </Link>        
+
         {/* Mobile Navigation - Only visible when menu is open on small screens */}
         {isMobileMenuOpen && (
           <nav className="mobile-nav" style={{
@@ -284,8 +279,9 @@ export default function BaseLayout({
             </Link>
           </nav>
         )}
+      </div>
       </header>
-
+  
       {/* Main Content */}
       {pageType === 'home' ? (
         <>
@@ -308,7 +304,7 @@ export default function BaseLayout({
         /* Regular Content for Other Pages */
         <main style={{ 
           backgroundColor: 'white',
-          paddingTop: pageType === 'article' ? '8rem' : '7rem', // Extra padding for article pages
+          paddingTop: getTopPadding(), // Extra padding for article pages
           minHeight: '70vh'
         }}>
           {title && (
@@ -402,7 +398,7 @@ export default function BaseLayout({
                 color: '#666',
                 fontSize: '0.95rem'
               }}>About</Link>
-              <Link href="https://knotless.bookerhq.ca/" style={{
+              <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: '#666',
