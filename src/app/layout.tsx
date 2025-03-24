@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Knotless Blog",
   description: "Knotless Blog",
+  icons: {
+    icon: { url: '/Icon.svg', type: 'image/svg+xml' }
+  }
 };
 
 export default function RootLayout({
