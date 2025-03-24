@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import useWindowSize from '../hooks/useWindowSize';
+import useWindowSize from '../../hooks/useWindowSize';
 
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
   const windowSize = useWindowSize();

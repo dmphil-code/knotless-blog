@@ -7,7 +7,7 @@ import ArticleCard from './components/ArticleCard';
 import HeroArticleCard from './components/HeroArticleCard';
 import Pagination from './components/Pagination';
 import HomeLayout from './components/HomeLayout';
-import useWindowSize from './hooks/useWindowSize';
+import useWindowSize from '../hooks/useWindowSize';
 
 export default function Home() {
   const windowSize = useWindowSize();

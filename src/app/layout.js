@@ -12,6 +12,9 @@ const montserrat = Montserrat({
 export const metadata = {
   title: 'Knotless',
   description: 'Sharing insights and knowledge about hair styling',
+  icons: {
+    icon: '/Icon.svg'
+  }
 }
 
 export default function RootLayout({ children }) {
