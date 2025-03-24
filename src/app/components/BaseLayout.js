@@ -1,3 +1,5 @@
+// BaseLayout.js - Updated with side drawer mobile menu
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -36,7 +38,7 @@ export default function BaseLayout({
 
   // If window size changes from mobile to desktop, close mobile menu
   useEffect(() => {
-    if (windowSize.width >= 768 && isMobileMenuOpen) {
+    if (windowSize.width >= 991 && isMobileMenuOpen) {
       setIsMobileMenuOpen(false);
     }
   }, [windowSize.width, isMobileMenuOpen]);
@@ -67,7 +69,20 @@ export default function BaseLayout({
   
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+    // When opening menu, prevent body scrolling
+    if (!isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
   };
+
+  // Clear body style when component unmounts
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
 
   // Colors based on page type and scroll state
   const getHeaderBgColor = () => {
@@ -128,7 +143,7 @@ export default function BaseLayout({
         
         {/* Navigation Links - Only visible on non-mobile screens */}
         <nav className="nav-links" style={{ 
-          display: windowSize.width >= 768 ? 'flex' : 'none',
+          display: windowSize.width >= 991 ? 'flex' : 'none',
           alignItems: 'center',
           flex: 1,
           marginLeft: '64px',
@@ -185,153 +200,398 @@ export default function BaseLayout({
           </Link>
         </nav>
         
-        {/* Mobile Menu Button - Only visible on mobile screens */}
-        {windowSize.width < 768 && (
-          <button 
-            onClick={toggleMobileMenu}
-            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '8px',
-              marginRight: '1rem'
-            }}
-          >
-            <div style={{
-              width: '24px',
-              height: '2px',
-              backgroundColor: '#333',
-              marginBottom: '5px',
-              transition: 'transform 0.3s ease',
-              transform: isMobileMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
-            }} />
-            <div style={{
-              width: '24px',
-              height: '2px',
-              backgroundColor: '#333',
-              marginBottom: '5px',
-              opacity: isMobileMenuOpen ? 0 : 1,
-              transition: 'opacity 0.3s ease'
-            }} />
-            <div style={{
-              width: '24px',
-              height: '2px',
-              backgroundColor: '#333',
-              transition: 'transform 0.3s ease',
-              transform: isMobileMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
-            }} />
-          </button>
-        )}
-        
-        {/* Auth Buttons - Updated with elevation and rounded corners */}
-        <div className="auth-buttons" style={{
+        {/* Auth Buttons and Mobile Menu Button Section */}
+        <div style={{
           display: 'flex',
           alignItems: 'center'
         }}>
-          <Link href="https://knotless.bookerhq.ca/login" style={{ marginRight: '0.75rem' }}>
-            <button style={{
-              background: '#F4B637', // Yellow color
-              color: '#333',
-              padding: '0 1.25rem',
-              borderRadius: '24px',
-              border: 'none',
-              height: '40px',
-              fontSize: '14px',
-              fontWeight: '400',
-              fontFamily: 'Montserrat, sans-serif',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              textTransform: 'capitalize'
-            }}>
-              Log In
+          {/* Auth Buttons */}
+          <div className="auth-buttons" style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginRight: windowSize.width < 991 ? '1rem' : '0'
+          }}>
+            <Link href="https://knotless.bookerhq.ca/login" style={{ marginRight: '0.75rem' }}>
+              <button style={{
+                background: '#F4B637', // Yellow color
+                color: '#333',
+                padding: '0 1.25rem',
+                borderRadius: '24px',
+                border: 'none',
+                height: '40px',
+                fontSize: '14px',
+                fontWeight: '400',
+                fontFamily: 'Montserrat, sans-serif',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                textTransform: 'capitalize'
+              }}>
+                Log In
+              </button>
+            </Link>
+            <Link href="https://knotless.bookerhq.ca/signup">
+              <button style={{
+                background: '#E9887E',
+                color: 'white',
+                padding: '0 1.25rem',
+                borderRadius: '24px',
+                border: 'none',
+                height: '40px',
+                fontSize: '14px',
+                fontWeight: '400',
+                fontFamily: 'Montserrat, sans-serif',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                textTransform: 'capitalize'
+              }}>
+                Join
+              </button>
+            </Link>
+          </div>
+          
+          {/* Mobile Menu Button - Moved to the right of auth buttons */}
+          {windowSize.width < 991 && (
+            <button 
+              onClick={toggleMobileMenu}
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '8px',
+                zIndex: 200 // Ensure it stays on top when drawer is open
+              }}
+            >
+              <div style={{
+                width: '24px',
+                height: '2px',
+                backgroundColor: '#333',
+                marginBottom: '5px',
+                transition: 'transform 0.3s ease, opacity 0.3s ease',
+                transform: isMobileMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
+              }} />
+              <div style={{
+                width: '24px',
+                height: '2px',
+                backgroundColor: '#333',
+                marginBottom: '5px',
+                opacity: isMobileMenuOpen ? 0 : 1,
+                transition: 'opacity 0.3s ease'
+              }} />
+              <div style={{
+                width: '24px',
+                height: '2px',
+                backgroundColor: '#333',
+                transition: 'transform 0.3s ease',
+                transform: isMobileMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
+              }} />
             </button>
-          </Link>
-          <Link href="https://knotless.bookerhq.ca/signup">
-            <button style={{
-              background: '#E9887E',
-              color: 'white',
-              padding: '0 1.25rem',
-              borderRadius: '24px',
-              border: 'none',
-              height: '40px',
-              fontSize: '14px',
-              fontWeight: '400',
-              fontFamily: 'Montserrat, sans-serif',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              textTransform: 'capitalize'
-            }}>
-              Join
-            </button>
-          </Link>
+          )}
         </div>
       </header>
 
-      {/* Mobile Navigation - Appears below header when menu is open */}
-      {isMobileMenuOpen && (
-        <div className="mobile-nav active" style={{
-          padding: '1rem',
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          position: 'fixed',
-          top: '80px',
-          left: 0,
-          width: '100%',
-          zIndex: 99,
-          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-        }}>
-          <Link href="https://knotless.bookerhq.ca/home" className="mobile-nav-link" style={{
-            display: 'block',
-            padding: '0.75rem 0',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-            color: 'white',
-            textDecoration: 'none',
-            textAlign: 'center'
+      {/* Mobile Side Drawer Menu */}
+      {windowSize.width < 991 && (
+        <>
+          {/* Dark overlay when menu is open */}
+          {isMobileMenuOpen && (
+            <div 
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 150,
+                transition: 'opacity 0.3s ease',
+                opacity: isMobileMenuOpen ? 1 : 0
+              }}
+              onClick={toggleMobileMenu}
+            />
+          )}
+          
+                      {/* Side drawer menu */}
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            right: isMobileMenuOpen ? 0 : '-100%',
+            width: '100%',
+            maxWidth: '400px', // Match the width from the reference image
+            height: '100vh',
+            backgroundColor: 'white',
+            zIndex: 180,
+            transition: 'right 0.3s ease',
+            overflowY: 'auto',
+            boxShadow: '-2px 0 10px rgba(0, 0, 0, 0.1)'
           }}>
-            Home
-          </Link>
-          <Link href="https://knotless.bookerhq.ca/aboutUs" className="mobile-nav-link" style={{
-            display: 'block',
-            padding: '0.75rem 0',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-            color: 'white',
-            textDecoration: 'none',
-            textAlign: 'center'
-          }}>
-            About
-          </Link>
-          <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" className="mobile-nav-link" style={{
-            display: 'block',
-            padding: '0.75rem 0',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-            color: 'white',
-            textDecoration: 'none',
-            textAlign: 'center'
-          }}>
-            Stylists
-          </Link>
-          <Link href="/" className="mobile-nav-link" style={{
-            display: 'block',
-            padding: '0.75rem 0',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-            color: 'white',
-            textDecoration: 'none',
-            textAlign: 'center'
-          }}>
-            Blog
-          </Link>
-          <Link href="https://knotless.bookerhq.ca/contactUs" className="mobile-nav-link" style={{
-            display: 'block',
-            padding: '0.75rem 0',
-            color: 'white',
-            textDecoration: 'none',
-            textAlign: 'center'
-          }}>
-            Contact Us
-          </Link>
-        </div>
+            {/* Menu header with close button */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '1.75rem 1.5rem'
+              // borderBottom: '1px solid #eee'
+            }}>
+              <h2 style={{
+                margin: 0,
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: '#222',
+                fontFamily: 'Montserrat, sans-serif'
+              }}>
+                Menu
+              </h2>
+              <button
+                onClick={toggleMobileMenu}
+                aria-label="Close menu"
+                style={{
+                  background: '#E9887E',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            {/* Menu items - Styled to match the reference image */}
+            <div style={{ padding: '0.5rem 0' }}>
+              <Link 
+                href="https://knotless.bookerhq.ca/home"
+                onClick={toggleMobileMenu}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1rem 1.5rem',
+                  textDecoration: 'none',
+                  color: '#333',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
+              >
+                <span>Home</span>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  backgroundColor: '#e9887e',
+                  color: 'white'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </div>
+              </Link>
+              
+              <Link 
+                href="https://knotless.bookerhq.ca/aboutUs"
+                onClick={toggleMobileMenu}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1rem 1.5rem',
+                  textDecoration: 'none',
+                  color: '#333',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
+              >
+                <span>About</span>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  backgroundColor: '#e9887e',
+                  color: 'white'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </div>
+              </Link>
+              
+              <Link 
+                href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar"
+                onClick={toggleMobileMenu}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1rem 1.5rem',
+                  textDecoration: 'none',
+                  color: '#333',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
+              >
+                <span>Stylists</span>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  backgroundColor: '#e9887e',
+                  color: 'white'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </div>
+              </Link>
+              
+              <Link 
+                href="/"
+                onClick={toggleMobileMenu}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1rem 1.5rem',
+                  textDecoration: 'none',
+                  color: '#333',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
+              >
+                <span>Blog</span>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  backgroundColor: '#e9887e',
+                  color: 'white'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </div>
+              </Link>
+              
+              <Link 
+                href="https://knotless.bookerhq.ca/contactUs"
+                onClick={toggleMobileMenu}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1rem 1.5rem',
+                  textDecoration: 'none',
+                  color: '#333',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
+              >
+                <span>Contact Us</span>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  backgroundColor: '#e9887e',
+                  color: 'white'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </div>
+              </Link>
+              
+              {/* Light/Dark mode toggles - Styled to match the reference image */}
+              <div style={{
+                padding: '1rem 1.5rem',
+                // borderBottom: '1px solid #eee'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#f5f5f7',
+                  borderRadius: '8px',
+                  padding: '0.5rem',
+                  marginTop: '0.5rem'
+                }}>
+                  <button style={{
+                    flex: 1,
+                    background: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '0.5rem',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    marginRight: '0.5rem',
+                    color: '#333'
+                  }}>
+                    <span style={{ marginRight: '0.5rem' }}>☀️</span>
+                    Light Mode
+                  </button>
+                  <button style={{
+                    flex: 1,
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '0.5rem',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#666'
+                  }}>
+                    <span style={{ marginRight: '0.5rem' }}>🌙</span>
+                    Dark Mode
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
   
       {/* Main Content */}
