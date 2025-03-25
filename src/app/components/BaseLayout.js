@@ -188,6 +188,18 @@ export default function BaseLayout({
           }}>
             Blog
           </Link>
+
+          <Link href="/store" className="nav-link" style={{
+            margin: '0 1.25rem',
+            textDecoration: 'none',
+            color: '#333',
+            fontSize: '14px',
+            fontFamily: 'Montserrat, sans-serif',
+            textTransform: 'capitalize'
+          }}>
+            Store
+          </Link>
+
           <Link href="https://knotless.bookerhq.ca/contactUs" className="nav-link" style={{
             margin: '0 1.25rem',
             textDecoration: 'none',
@@ -505,6 +517,40 @@ export default function BaseLayout({
               </Link>
               
               <Link 
+                href="/store"
+                onClick={toggleMobileMenu}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1rem 1.5rem',
+                  textDecoration: 'none',
+                  color: '#333',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
+              >
+                <span>Store</span>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  backgroundColor: '#e9887e',
+                  color: 'white'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </div>
+              </Link>
+
+              <Link 
                 href="https://knotless.bookerhq.ca/contactUs"
                 onClick={toggleMobileMenu}
                 style={{
@@ -733,6 +779,12 @@ export default function BaseLayout({
                 color: '#666',
                 fontSize: '0.95rem'
               }}>Blog</Link>
+              <Link href="/store" style={{
+                marginBottom: '0.5rem',
+                textDecoration: 'none',
+                color: '#666',
+                fontSize: '0.95rem'
+              }}>Store</Link>
               <Link href="https://knotless.bookerhq.ca/contactUs" style={{
                 textDecoration: 'none',
                 color: '#666',
