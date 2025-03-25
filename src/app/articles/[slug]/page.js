@@ -24,7 +24,7 @@ export default function ArticleDetail() {
     const fetchArticle = async () => {
       setLoading(true);
       try {
-        console.log(`Fetching article by ${isId ? 'ID' : 'slug'}: ${slug}`);
+        // console.log(`Fetching article by ${isId ? 'ID' : 'slug'}: ${slug}`);
         
         let articleData;
         if (isId) {
@@ -35,7 +35,7 @@ export default function ArticleDetail() {
           articleData = await getArticleBySlug(slug);
         }
         
-        console.log('Article data:', articleData);
+        // console.log('Article data:', articleData);
         
         if (!articleData) {
           setError('Article not found');

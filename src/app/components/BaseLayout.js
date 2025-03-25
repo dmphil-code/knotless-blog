@@ -540,8 +540,7 @@ export default function BaseLayout({
               
               {/* Light/Dark mode toggles - Styled to match the reference image */}
               <div style={{
-                padding: '1rem 1.5rem',
-                // borderBottom: '1px solid #eee'
+                padding: '1rem 1.5rem'
               }}>
                 <div style={{
                   display: 'flex',

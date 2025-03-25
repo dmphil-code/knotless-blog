@@ -33,7 +33,7 @@ export default function Home() {
     setLoading(true);
     try {
       const { data, meta } = await getArticles(page, pagination.pageSize);
-      console.log('Fetched articles data structure:', data);
+      // console.log('Fetched articles data structure:', data);
       
       // Split articles - first 3 for hero section, rest for grid
       if (data && data.length > 0) {

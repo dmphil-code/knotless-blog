@@ -8,7 +8,7 @@ const ArticleCard = ({ article }) => {
   const { id, title, publishDate, slug, image, author } = article;
   
   // Log for debugging
-  console.log(`ArticleCard for ${title}:`, { image });
+  // console.log(`ArticleCard for ${title}:`, { image });
   
   return (
     <div className={styles.articleCardContainer}>

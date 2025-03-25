@@ -6,7 +6,7 @@ const api = axios.create({
 });
 
 // At the top of your API service file
-console.log('API Base URL being used:', process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337/api');
+// console.log('API Base URL being used:', process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337/api');
 
 // Get all articles with pagination, sorting, and filtering
 export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:desc', filters = {}) => {
@@ -26,13 +26,13 @@ export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:d
       queryParams.filters = filters;
     }
 
-    console.log('Query params for getArticles:', queryParams);
+    // console.log('Query params for getArticles:', queryParams);
 
     const response = await api.get('/articles', {
       params: queryParams
     });
 
-    console.log('Strapi response:', response.data);
+    // console.log('Strapi response:', response.data);
     
     // Return the data as is - since your Strapi doesn't use the attributes structure
     return {
@@ -54,7 +54,7 @@ export const getArticleById = async (id) => {
       },
     });
 
-    console.log('Article by ID response:', response.data);
+    // console.log('Article by ID response:', response.data);
     
     // Return the article data directly, not wrapped in response.data.data
     return response.data || null;
@@ -67,7 +67,7 @@ export const getArticleById = async (id) => {
 // Get a single article by slug
 export const getArticleBySlug = async (slug) => {
   try {
-    console.log('Fetching article by slug:', slug);
+    // console.log('Fetching article by slug:', slug);
     
     const response = await api.get('/articles', {
       params: {
@@ -80,7 +80,7 @@ export const getArticleBySlug = async (slug) => {
       },
     });
 
-    console.log('Article by slug response:', response.data);
+    // console.log('Article by slug response:', response.data);
     
     // Return the first article directly (not inside attributes)
     return response.data.data[0] || null;
@@ -122,7 +122,7 @@ export const searchArticles = async (query, page = 1, pageSize = 10) => {
       },
     });
 
-    console.log('Search results:', response.data);
+    // console.log('Search results:', response.data);
 
     return {
       data: response.data.data,
