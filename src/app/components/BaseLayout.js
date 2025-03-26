@@ -657,6 +657,15 @@ export default function BaseLayout({
               : (!Array.isArray(children) ? children : null)}
           </main>
         </>
+      ) : pageType === 'store' ? (
+        /* Content for Store Page */
+        <main style={{ 
+          backgroundColor: 'white',
+          paddingTop: '80px', /* Account for the fixed header */
+          minHeight: '70vh'
+        }}>
+          {children}
+        </main>
       ) : (
         /* Regular Content for Other Pages */
         <main style={{ 

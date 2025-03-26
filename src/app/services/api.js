@@ -148,3 +148,72 @@ export const getCategories = async () => {
     return [];
   }
 };
+
+export const getAffiliateLinks = async (page = 1, pageSize = 12, sort = 'name:asc', filters = {}) => {
+  try {
+    // Build query parameters
+    const queryParams = {
+      sort,
+      pagination: {
+        page,
+        pageSize,
+      },
+      populate: '*' // Make sure to populate all fields
+    };
+
+    // Add filters if they exist
+    if (Object.keys(filters).length) {
+      queryParams.filters = filters;
+    }
+
+    const response = await api.get('/affiliates', {
+      params: queryParams
+    });
+    
+    // Return the data structure matching the same pattern as other API functions
+    return {
+      data: response.data.data,
+      meta: response.data.meta,
+    };
+  } catch (error) {
+    console.error('Error fetching affiliate links:', error.response?.data || error.message || error);
+    return { data: [], meta: { pagination: { page: 1, pageSize, total: 0 } } };
+  }
+};
+
+// Get a single affiliate link by ID
+export const getAffiliateLinkById = async (id) => {
+  try {
+    const response = await api.get(`/affiliates/${id}`, {
+      params: {
+        populate: '*',
+      },
+    });
+    
+    return response.data || null;
+  } catch (error) {
+    console.error('Error fetching affiliate link by ID:', error.response?.data || error.message || error);
+    return null;
+  }
+};
+
+// Get a single affiliate link by slug
+export const getAffiliateLinkBySlug = async (slug) => {
+  try {
+    const response = await api.get('/affiliates', {
+      params: {
+        filters: {
+          slug: {
+            $eq: slug,
+          },
+        },
+        populate: '*',
+      },
+    });
+    
+    return response.data.data[0] || null;
+  } catch (error) {
+    console.error('Error fetching affiliate link by slug:', error.response?.data || error.message || error);
+    return null;
+  }
+};

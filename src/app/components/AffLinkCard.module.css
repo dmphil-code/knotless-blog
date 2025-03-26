@@ -1,13 +1,13 @@
 .aff-link-card {
-    width: 160px;
-    height: 140px;
+    width: 320px;       /* Changed to 320px */
+    height: 320px;      /* Changed to 320px */
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 12px;  /* Rounded corners by 12pts */
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    background-color: #f9f9f9;
+    background-color: #FFE8C9; /* Background color */
   }
   
   .aff-link-card:hover {
@@ -16,7 +16,8 @@
     background-color: #E9887E;
   }
   
-  .aff-link-card:hover .aff-link-title {
+  .aff-link-card:hover .aff-link-name,
+  .aff-link-card:hover .aff-link-company {
     color: white;
   }
   
@@ -27,7 +28,7 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 15px;
+    padding: 30px;
   }
   
   .aff-link-content {
@@ -40,26 +41,50 @@
     position: relative;
   }
   
-  .aff-link-title {
-    font-size: 0.95rem;
+  .aff-link-name {
+    font-size: 1.8rem;
     font-weight: 600;
     line-height: 1.3;
-    color: #333;
+    color: #773800; /* Darker color for better contrast with #FFE8C9 */
+    margin-bottom: 16px;
     transition: color 0.3s ease;
+    /* Important: Fix for underline issue */
+    text-decoration: none !important;
+    /* Handle text overflow */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .aff-link-company {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #9A6434; /* Adjusted for better contrast with #FFE8C9 */
+    transition: color 0.3s ease;
+    /* Important: Fix for underline issue */
+    text-decoration: none !important;
+    /* Handle text overflow */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .aff-link-shop-now {
     position: absolute;
-    bottom: 10px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     background-color: #fff;
     color: #E9887E;
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 500;
-    padding: 5px 15px;
-    border-radius: 15px;
+    padding: 8px 20px;
+    border-radius: 20px;
     opacity: 0;
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
@@ -70,28 +95,68 @@
   }
   
   /* Responsive adjustments */
-  @media (max-width: 768px) {
+  @media (max-width: 992px) {
     .aff-link-card {
-      width: 140px;
-      height: 120px;
+      width: 280px;
+      height: 280px;
     }
     
-    .aff-link-title {
-      font-size: 0.85rem;
+    .aff-link-card-inner {
+      padding: 25px;
+    }
+    
+    .aff-link-name {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+    
+    .aff-link-company {
+      font-size: 1.1rem;
+    }
+    
+    .aff-link-shop-now {
+      font-size: 0.9rem;
+      padding: 8px 16px;
     }
   }
   
-  @media (max-width: 479px) {
+  @media (max-width: 768px) {
     .aff-link-card {
-      width: 130px;
-      height: 110px;
+      width: 260px;
+      height: 260px;
     }
     
-    .aff-link-content {
-      padding: 8px;
+    .aff-link-name {
+      font-size: 1.4rem;
     }
     
-    .aff-link-title {
-      font-size: 0.8rem;
+    .aff-link-company {
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .aff-link-card {
+      width: 240px;
+      height: 240px;
+    }
+    
+    .aff-link-card-inner {
+      padding: 20px;
+    }
+    
+    .aff-link-name {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+    
+    .aff-link-company {
+      font-size: 0.9rem;
+    }
+    
+    .aff-link-shop-now {
+      font-size: 0.9rem;
+      padding: 6px 15px;
+      bottom: 20px;
     }
   }

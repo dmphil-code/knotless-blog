@@ -1,118 +1,201 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+import { getAffiliateLinks } from '../services/api';
 import AffLinkCard from '../components/AffLinkCard';
 import StoreLayout from '../components/StoreLayout';
+import StoreHero from '../components/StoreHero';
+import Pagination from '../components/Pagination';
 import useWindowSize from '../../hooks/useWindowSize';
-
-// Sample product data - in production, this would come from an API or CMS
-const sampleProducts = [
-  {
-    id: 1,
-    title: "Silk Press Heat Protectant",
-    link: "https://example.com/product1"
-  },
-  {
-    id: 2,
-    title: "Edge Control Gel",
-    link: "https://example.com/product2"
-  },
-  {
-    id: 3,
-    title: "Detangling Brush",
-    link: "https://example.com/product3"
-  },
-  {
-    id: 4,
-    title: "Moisture Retention Shampoo",
-    link: "https://example.com/product4"
-  },
-  {
-    id: 5,
-    title: "Leave-in Conditioner",
-    link: "https://example.com/product5"
-  },
-  {
-    id: 6,
-    title: "Scalp Treatment Oil",
-    link: "https://example.com/product6"
-  },
-  {
-    id: 7,
-    title: "Wide Tooth Comb",
-    link: "https://example.com/product7"
-  },
-  {
-    id: 8,
-    title: "Hair Growth Vitamins",
-    link: "https://example.com/product8"
-  },
-  {
-    id: 9,
-    title: "Curl Defining Cream",
-    link: "https://example.com/product9"
-  }
-];
-
-// If you don't have product images yet, you can remove the image property
-// or use placeholder images
 
 export default function StorePage() {
   const windowSize = useWindowSize();
-  const [products, setProducts] = useState(sampleProducts);
-  // Since we've removed categories, we'll just use all products
-  const filteredProducts = products;
+  const [affiliates, setAffiliates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 9, // 3x3 grid
+    total: 0,
+  });
+
+  // Determine optimal grid columns based on screen width
+  const getGridColumns = () => {
+    const width = windowSize.width || 0;
+    if (width >= 1200) return 3; // 3 columns on large screens
+    if (width >= 768) return 2;  // 2 columns on medium screens
+    return 1;                   // 1 column on small screens
+  };
+
+  // Fetch affiliate links from Strapi
+  const fetchAffiliateLinks = async (page = 1) => {
+    setLoading(true);
+    try {
+      const { data, meta } = await getAffiliateLinks(page, pagination.pageSize);
+      
+      if (data && data.length > 0) {
+        setAffiliates(data);
+      } else {
+        setAffiliates([]);
+      }
+      
+      setPagination(meta.pagination);
+    } catch (error) {
+      console.error("Error fetching affiliate links:", error);
+      setAffiliates([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle page change for pagination
+  const handlePageChange = (newPage) => {
+    fetchAffiliateLinks(newPage);
+    // Scroll to top when changing pages
+    window.scrollTo(0, 0);
+  };
+
+  // Fetch affiliate links on component mount
+  useEffect(() => {
+    fetchAffiliateLinks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Transform affiliate data to the structure expected by AffLinkCard
+  const transformAffiliateData = (affiliate) => {
+    if (!affiliate) {
+      console.warn('Invalid affiliate data:', affiliate);
+      return null;
+    }
+    
+    return {
+      id: affiliate.id,
+      name: affiliate.name || 'Unnamed Affiliate',
+      url: affiliate.url || '#',
+      company: affiliate.company || '',
+      slug: affiliate.slug || null,
+      articles: affiliate.articles || [],
+      categories: affiliate.categories || [],
+      author: affiliate.author || null
+    };
+  };
   
-  // No category handling needed
+  // Calculate max width based on grid columns
+  const getMaxWidth = () => {
+    const columns = getGridColumns();
+    // Account for gap (30px) between cards
+    if (columns === 1) return '320px'; // 1 card width
+    if (columns === 2) return '670px'; // (320px * 2) + 30px gap
+    return '1020px'; // (320px * 3) + (30px * 2) gaps
+  };
+  
+  // Hero section title and description
+  const heroTitle = "Our Affiliate Partners";
+  const heroDescription = "Check out these great products and services we recommend";
   
   return (
-    <StoreLayout 
-      title="Our Store" 
-      description="Discover our favorite hair care products for all your styling needs"
-    >
+    <StoreLayout>
+      {/* Hero Section - Added at the top */}
+      <StoreHero 
+        title={heroTitle} 
+        description={heroDescription} 
+      />
+      
       <div style={{ 
-        maxWidth: '1200px',
+        maxWidth: '1200px', // Container max width
         margin: '0 auto',
         padding: '0 2rem 3rem'
       }}>
-
-        
-        {/* Products Grid - 3x3 */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: windowSize.width < 600 
-            ? 'repeat(2, 1fr)' 
-            : 'repeat(3, 1fr)',
-          gap: '30px',
-          justifyItems: 'center',
-          maxWidth: '600px',
-          margin: '0 auto'
-        }}>
-          {filteredProducts.map(product => (
-            <AffLinkCard key={product.id} product={product} />
-          ))}
-        </div>
-        
-        {/* Empty State */}
-        {filteredProducts.length === 0 && (
+        {loading ? (
+          // Loading state
           <div style={{
-            textAlign: 'center',
-            padding: '3rem 0',
-            color: '#666'
+            display: 'grid',
+            gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)`,
+            gap: '30px',
+            justifyContent: 'center',
+            margin: '0 auto',
+            maxWidth: getMaxWidth()
           }}>
-            <p>No products found in this category.</p>
+            {Array(Math.min(getGridColumns() * 3, 9)).fill().map((_, i) => (
+              <div key={i} style={{
+                width: '100%',
+                aspectRatio: '1 / 1',
+                backgroundColor: '#f5f5f5',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}></div>
+            ))}
           </div>
+        ) : (
+          affiliates.length > 0 ? (
+            <>
+              {/* Affiliate Links Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)`,
+                gap: '30px',
+                justifyContent: 'center',
+                margin: '0 auto',
+                maxWidth: getMaxWidth()
+              }}>
+                {affiliates.map((affiliate) => {
+                  const transformedAffiliate = transformAffiliateData(affiliate);
+                  if (!transformedAffiliate) return null;
+                  
+                  return (
+                    <AffLinkCard 
+                      key={affiliate.id} 
+                      affiliate={transformedAffiliate} 
+                    />
+                  );
+                })}
+              </div>
+              
+              {/* Pagination */}
+              {pagination.total > pagination.pageSize && (
+                <div style={{ marginTop: '3rem' }}>
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={Math.ceil(pagination.total / pagination.pageSize)}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            // No affiliates available
+            <div style={{
+              textAlign: 'center',
+              padding: '4rem 0',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}>
+              <p style={{
+                fontSize: '1.25rem',
+                color: '#666',
+                marginBottom: '1.5rem'
+              }}>
+                No affiliate links available at the moment.
+              </p>
+              <p style={{
+                fontSize: '1rem',
+                color: '#888'
+              }}>
+                Please check back later for recommendations.
+              </p>
+            </div>
+          )
         )}
         
         {/* Disclaimer */}
         <div style={{
-          margin: '4rem 0 1rem',
+          margin: '4rem auto 1rem',
           padding: '1.5rem',
           backgroundColor: '#f9f9f9',
-          borderRadius: '8px',
+          borderRadius: '12px',
           fontSize: '0.9rem',
           color: '#666',
-          textAlign: 'center'
+          textAlign: 'center',
+          maxWidth: '800px'
         }}>
           <p>
             <strong>Disclaimer:</strong> Some links on this page may be affiliate links. If you make a purchase through these links, we may earn a small commission at no extra cost to you.

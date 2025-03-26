@@ -3,23 +3,39 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './AffLinkCard.module.css';
 
-const AffLinkCard = ({ product }) => {
+const AffLinkCard = ({ affiliate }) => {
+  // Extract properties from affiliate object
   const { 
-    title, 
-    link = '#', // Default link if none provided
-  } = product;
+    name,        // Name field from Strapi
+    url,         // URL field from Strapi 
+    company      // Company field from Strapi
+  } = affiliate;
 
   return (
     <div className={styles['aff-link-card']}>
-      <Link href={link} target="_blank" rel="noopener noreferrer">
+      <Link 
+        href={url || '#'} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        style={{ textDecoration: 'none' }} // Explicitly remove underline from Link
+      >
         <div className={styles['aff-link-card-inner']}>
-          {/* Title only */}
           <div className={styles['aff-link-content']}>
-            <h3 className={styles['aff-link-title']}>{title}</h3>
+            {/* Name (in larger font) - with additional inline style to prevent underline */}
+            <h3 className={styles['aff-link-name']} style={{ textDecoration: 'none' }}>
+              {name}
+            </h3>
             
-            {/* Shop Now Button (Visible on Hover) */}
+            {/* Company (if it exists) - with additional inline style to prevent underline */}
+            {company && (
+              <p className={styles['aff-link-company']} style={{ textDecoration: 'none' }}>
+                {company}
+              </p>
+            )}
+            
+            {/* Visit button (visible on hover) */}
             <div className={styles['aff-link-shop-now']}>
-              View
+              Visit
             </div>
           </div>
         </div>
