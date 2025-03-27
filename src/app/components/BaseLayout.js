@@ -242,7 +242,7 @@ export default function BaseLayout({
                 Log In
               </button>
             </Link>
-            <Link href="https://knotless.bookerhq.ca/signup">
+            <Link href="https://knotless.bookerhq.ca/login">
               <button style={{
                 background: '#E9887E',
                 color: 'white',
