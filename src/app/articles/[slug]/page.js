@@ -24,8 +24,6 @@ export default function ArticleDetail() {
     const fetchArticle = async () => {
       setLoading(true);
       try {
-        // console.log(`Fetching article by ${isId ? 'ID' : 'slug'}: ${slug}`);
-        
         let articleData;
         if (isId) {
           // Fetch by ID if slug is a number
@@ -34,8 +32,6 @@ export default function ArticleDetail() {
           // Fetch by slug
           articleData = await getArticleBySlug(slug);
         }
-        
-        // console.log('Article data:', articleData);
         
         if (!articleData) {
           setError('Article not found');
@@ -97,6 +93,15 @@ export default function ArticleDetail() {
       })
     : 'Unknown date';
 
+  // Image URL handling
+  const getThumbnailUrl = () => {
+    if (!article.thumbnail || !article.thumbnail.url) return null;
+    
+    return article.thumbnail.url.startsWith('http') 
+      ? article.thumbnail.url 
+      : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`;
+  };
+
   // Custom component mapping for ReactMarkdown
   const components = {
     img: ({ src, alt, ...props }) => {
@@ -106,7 +111,6 @@ export default function ArticleDetail() {
       }
       return (
         <div style={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
-          {/* Use regular img tag with warning suppressed by ESLint config */}
           <img 
             src={src} 
             alt={alt || ''} 
@@ -143,76 +147,140 @@ export default function ArticleDetail() {
 
   return (
     <ArticleLayout>
+      {/* Hero Section - Full width */}
+      <div style={{
+        width: '100%',
+        backgroundImage: 'url("/images/hero-background2.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundBlendMode: 'soft-light',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        padding: windowSize.width < 768 ? '80px 20px 60px' : '100px 40px 80px',
+        marginTop: '-80px' // This removes the gap between header and hero
+      }}>
+        {/* Hero Content Container - For centering and max-width */}
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          display: 'flex',
+          flexDirection: windowSize.width < 992 ? 'column' : 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: windowSize.width < 992 ? '30px' : '60px'
+        }}>
+          {/* Thumbnail Image - Left side on desktop, top on mobile */}
+          <div style={{
+            width: windowSize.width < 992 ? '100%' : '40%',
+            display: 'flex',
+            justifyContent: windowSize.width < 992 ? 'center' : 'flex-end'
+          }}>
+            {getThumbnailUrl() ? (
+              <img
+                src={getThumbnailUrl()}
+                alt={article.title}
+                style={{ 
+                  width: windowSize.width < 992 ? '100%' : 'auto', 
+                  maxWidth: '100%',
+                  height: windowSize.width < 992 ? 'auto' : '400px',
+                  maxHeight: windowSize.width < 768 ? '250px' : '400px',
+                  objectFit: 'cover',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+                }}
+              />
+            ) : (
+              <div style={{
+                width: windowSize.width < 992 ? '100%' : '400px',
+                height: windowSize.width < 992 ? '250px' : '400px',
+                backgroundColor: '#333',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#666'
+              }}>
+                No image available
+              </div>
+            )}
+          </div>
+          
+          {/* Text Content - Right side on desktop, bottom on mobile */}
+          <div style={{
+            width: windowSize.width < 992 ? '100%' : '60%',
+            textAlign: windowSize.width < 992 ? 'center' : 'left',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Back link positioned at top of text column */}
+            <div style={{
+              marginBottom: '20px',
+              alignSelf: windowSize.width < 992 ? 'center' : 'flex-start'
+            }}>
+              <Link 
+                href="/" 
+                style={{ 
+                  color: 'white',
+                  textDecoration: 'none', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontWeight: '500',
+                  fontSize: windowSize.width < 768 ? '0.9rem' : '1rem'
+                }}
+              >
+                <span style={{ marginRight: '6px' }}>←</span> Back to all articles
+              </Link>
+            </div>
+            
+            {/* Title */}
+            <h1 style={{ 
+              color: 'white',
+              fontSize: windowSize.width < 768 ? '1.75rem' : windowSize.width < 992 ? '2.25rem' : '2.75rem',
+              fontWeight: 'bold',
+              marginBottom: '1.5rem',
+              lineHeight: '1.2',
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
+            }}>
+              {article.title}
+            </h1>
+            
+            {/* Author and Date info */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              alignItems: windowSize.width < 992 ? 'center' : 'flex-start'
+            }}>
+              {article.author && article.author.name && (
+                <p style={{ 
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: windowSize.width < 768 ? '1rem' : '1.125rem',
+                  fontWeight: '500',
+                  margin: 0,
+                  textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)'
+                }}>
+                  {article.author.name}
+                </p>
+              )}
+              
+              <p style={{ 
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: windowSize.width < 768 ? '0.9rem' : '1rem',
+                margin: 0,
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)'
+              }}>
+                {publishDate}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Article Content Section */}
       <article style={{ 
         maxWidth: '800px', 
         margin: '0 auto', 
-        padding: '0 1rem' 
+        padding: '40px 20px 60px'
       }}>
-        {/* Back link positioned above the main title */}
-        <Link 
-          href="/" 
-          style={{ 
-            color: '#E9887E', 
-            textDecoration: 'none', 
-            display: 'inline-block', 
-            marginBottom: '2rem',
-            fontWeight: '500'
-          }}
-        >
-          ← Back to all articles
-        </Link>
-  
-        {/* Single main title */}
-        <h1 style={{ 
-          fontSize: windowSize.width < 768 ? '1.75rem' : '2.5rem', 
-          fontWeight: 'bold', 
-          marginBottom: '1.5rem', 
-          textAlign: 'center',
-          color: '#333'
-        }}>
-          {article.title}
-        </h1>
-  
-        {/* Author and date stacked vertically */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          textAlign: 'center', 
-          marginBottom: '2rem' 
-        }}>
-          {article.author && (
-            <div style={{ marginBottom: '0.5rem' }}>
-              <span style={{ color: '#555', fontWeight: '500' }}>{article.author.name}</span>
-            </div>
-          )}
-          <span style={{ color: '#777' }}>{publishDate}</span>
-        </div>
-  
-        {/* Centered thumbnail image */}
-        {article.thumbnail && article.thumbnail.url && (
-          <div style={{ 
-            marginBottom: '2.5rem', 
-            display: 'flex', 
-            justifyContent: 'center' 
-          }}>
-            <img
-              src={article.thumbnail.url.startsWith('http') 
-                ? article.thumbnail.url 
-                : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`}
-                alt={article.title}
-              style={{ 
-                borderRadius: '12px', 
-                maxHeight: windowSize.width < 768 ? '300px' : '450px', 
-                maxWidth: '100%',
-                objectFit: 'cover',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
-              }}
-            />
-          </div>
-        )}
-  
         {/* Article content with proper styling - Using content field */}
         <div style={{ margin: '0 auto' }} className="markdown-content">
           {article.content ? (
