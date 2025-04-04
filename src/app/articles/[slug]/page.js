@@ -147,233 +147,295 @@ export default function ArticleDetail() {
 
   return (
     <ArticleLayout>
-      {/* Hero Section - Full width */}
+      {/* Main container with side image */}
       <div style={{
+        position: 'relative',
         width: '100%',
-        backgroundImage: 'url("/images/hero-background2.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundBlendMode: 'soft-light',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        padding: windowSize.width < 768 ? '80px 20px 60px' : '100px 40px 80px',
-        marginTop: '-80px' // This removes the gap between header and hero
+        overflow: 'hidden' // Ensure the image doesn't cause horizontal scrolling
       }}>
-        {/* Hero Content Container - For centering and max-width */}
+        {/* CSS-based vertical lines - 4 colors repeated three times */}
         <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
+          position: 'fixed',
+          top: 0,
+          bottom: 0,
+          left: windowSize.width < 1450 ? '-9999px' : 'calc((100% - 1000px) / 2 * 0.25)',
+          height: '100vh',
+          width: '120px', // Adjusted width for the stripes
+          pointerEvents: 'none',
+          zIndex: 0,
           display: 'flex',
-          flexDirection: windowSize.width < 992 ? 'column' : 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: windowSize.width < 992 ? '30px' : '60px'
+          flexDirection: 'row'
         }}>
-          {/* Thumbnail Image - Left side on desktop, top on mobile */}
-          <div style={{
-            width: windowSize.width < 992 ? '100%' : '40%',
-            display: 'flex',
-            justifyContent: windowSize.width < 992 ? 'center' : 'flex-end'
-          }}>
-            {getThumbnailUrl() ? (
-              <img
-                src={getThumbnailUrl()}
-                alt={article.title}
+          {/* Create array of colors and map to divs */}
+          {[...Array(3)].map((_, groupIndex) => (
+            ['#E9887E', '#F4B637', '#FFE8C9', '#773800'].map((color, colorIndex) => (
+              <div 
+                key={`stripe-${groupIndex}-${colorIndex}`}
                 style={{ 
-                  width: windowSize.width < 992 ? '100%' : 'auto', 
-                  maxWidth: '100%',
-                  height: windowSize.width < 992 ? 'auto' : '400px',
-                  maxHeight: windowSize.width < 768 ? '250px' : '400px',
-                  objectFit: 'cover',
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+                  flex: '1',
+                  height: '100%',
+                  backgroundColor: color
                 }}
-              />
-            ) : (
+              ></div>
+            ))
+          ))}
+        </div>
+        {/* Content with consistent padding */}
+        <div style={{
+          position: 'relative',
+          zIndex: 2,
+          padding: '0 20px', // Consistent padding without extra for side image
+          maxWidth: '1000px',
+          margin: '0 auto',
+        }}>
+          {/* Redesigned Hero Section with consistent padding */}
+          <div style={{
+            width: '100%',
+            backgroundColor: 'white',
+            padding: '60px 0 60px', // Remove horizontal padding from container
+            marginTop: '-20px'
+          }}>
+            {/* Hero Content Container with flex layout */}
+            <div style={{
+              maxWidth: '1000px',
+              margin: '0 auto',
+              display: 'flex',
+              flexDirection: windowSize.width < 992 ? 'column' : 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '30px',
+              paddingRight: '20px', // Add padding to match article content exactly
+            }}>
+              {/* Left column for all text content - aligned with content section */}
               <div style={{
-                width: windowSize.width < 992 ? '100%' : '400px',
-                height: windowSize.width < 992 ? '250px' : '400px',
-                backgroundColor: '#333',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#666'
+                flex: '1',
+                maxWidth: windowSize.width < 992 ? '100%' : '600px',
               }}>
-                No image available
+                {/* Back link at top of text column */}
+                <div style={{
+                  marginBottom: '40px',
+                }}>
+                  <Link 
+                    href="/" 
+                    style={{ 
+                      color: '#E9887E',
+                      textDecoration: 'none', 
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontWeight: '500',
+                      fontSize: '1rem'
+                    }}
+                  >
+                    <span style={{ marginRight: '6px' }}>←</span> Back to all articles
+                  </Link>
+                </div>
+                
+                {/* Title */}
+                <h1 style={{ 
+                  color: '#773800',
+                  fontFamily: 'Bauhaus Soft Display, sans-serif',
+                  fontSize: windowSize.width < 768 ? '1.75rem' : windowSize.width < 992 ? '2.25rem' : '2.75rem',
+                  fontWeight: '600',
+                  marginTop: '0',
+                  marginBottom: '1.5rem',
+                  lineHeight: '1.2',
+                  textAlign: 'left'
+                }}>
+                  {article.title}
+                </h1>
+                
+                {/* Author and date */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  alignItems: 'flex-start'
+                }}>
+                  {article.author && article.author.name && (
+                    <p style={{ 
+                      color: '#773800',
+                      fontFamily: 'Bauhaus Soft Display, sans-serif',
+                      fontSize: windowSize.width < 768 ? '1rem' : '1.125rem',
+                      fontWeight: '500',
+                      margin: 0
+                    }}>
+                      {article.author.name}
+                    </p>
+                  )}
+                  
+                  <p style={{ 
+                    color: '#773800',
+                    fontFamily: 'Bauhaus Soft Display, sans-serif',
+                    fontSize: windowSize.width < 768 ? '0.9rem' : '1rem',
+                    margin: 0
+                  }}>
+                    {publishDate}
+                  </p>
+                </div>
               </div>
-            )}
+              
+              {/* Right column for image - center aligned with entire text column */}
+              <div style={{
+                flex: '0 0 auto',
+                width: windowSize.width < 768 ? '200px' : '280px',
+                alignSelf: 'center',
+                marginRight: windowSize.width < 992 ? 'auto' : '0',
+                marginLeft: windowSize.width < 992 ? 'auto' : '0',
+              }}>
+                {getThumbnailUrl() ? (
+                  <div style={{
+                    width: '100%',
+                    height: windowSize.width < 768 ? '200px' : '280px',
+                    position: 'relative'
+                  }}>
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      mask: 'url(/images/image_mask3.png) center/contain no-repeat',
+                      WebkitMask: 'url(/images/image_mask3.png) center/contain no-repeat',
+                      zIndex: 2
+                    }}>
+                      <img
+                        src={getThumbnailUrl()}
+                        alt={article.title}
+                        style={{ 
+                          width: '100%', 
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    width: '100%',
+                    height: windowSize.width < 768 ? '200px' : '280px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#666'
+                  }}>
+                    No image available
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           
-          {/* Text Content - Right side on desktop, bottom on mobile */}
-          <div style={{
-            width: windowSize.width < 992 ? '100%' : '60%',
-            textAlign: windowSize.width < 992 ? 'center' : 'left',
+          {/* Article Content Section with increased spacing */}
+          <article style={{ 
+            maxWidth: '1000px', 
+            margin: '40px auto 0', // Increased top margin to 40px for more spacing
+            padding: '0',
             display: 'flex',
             flexDirection: 'column'
           }}>
-            {/* Back link positioned at top of text column */}
-            <div style={{
-              marginBottom: '20px',
-              alignSelf: windowSize.width < 992 ? 'center' : 'flex-start'
-            }}>
-              <Link 
-                href="/" 
-                style={{ 
-                  color: 'white',
-                  textDecoration: 'none', 
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontWeight: '500',
-                  fontSize: windowSize.width < 768 ? '0.9rem' : '1rem'
-                }}
-              >
-                <span style={{ marginRight: '6px' }}>←</span> Back to all articles
-              </Link>
-            </div>
-            
-            {/* Title */}
-            <h1 style={{ 
-              color: 'white',
-              fontSize: windowSize.width < 768 ? '1.75rem' : windowSize.width < 992 ? '2.25rem' : '2.75rem',
-              fontWeight: 'bold',
-              marginBottom: '1.5rem',
-              lineHeight: '1.2',
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
-            }}>
-              {article.title}
-            </h1>
-            
-            {/* Author and Date info */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-              alignItems: windowSize.width < 992 ? 'center' : 'flex-start'
-            }}>
-              {article.author && article.author.name && (
-                <p style={{ 
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  fontSize: windowSize.width < 768 ? '1rem' : '1.125rem',
-                  fontWeight: '500',
-                  margin: 0,
-                  textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)'
+            {/* Article content with proper styling - Using content field */}
+            <div style={{ 
+              margin: '0',
+              width: '100%',
+              paddingRight: '20px', // Add explicit padding to match hero section
+            }} className="markdown-content">
+              {article.content ? (
+                <ReactMarkdown components={{
+                  ...components,
+                  // Override some components for responsive design
+                  h1: ({ children }) => (
+                    <h1 style={{
+                      fontSize: windowSize.width < 768 ? '1.75rem' : '2.25rem', 
+                      fontWeight: 'bold', 
+                      margin: '2rem 0 1rem', 
+                      color: '#444'
+                    }}>
+                      {children}
+                    </h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 style={{
+                      fontSize: windowSize.width < 768 ? '1.5rem' : '1.875rem', 
+                      fontWeight: 'bold', 
+                      margin: '1.75rem 0 1rem', 
+                      color: '#444'
+                    }}>
+                      {children}
+                    </h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 style={{
+                      fontSize: windowSize.width < 768 ? '1.25rem' : '1.5rem', 
+                      fontWeight: 'bold', 
+                      margin: '1.5rem 0 0.75rem', 
+                      color: '#444'
+                    }}>
+                      {children}
+                    </h3>
+                  ),
+                  p: ({ children }) => (
+                    <p style={{
+                      margin: '1.25rem 0', 
+                      lineHeight: '1.7', 
+                      color: '#444', 
+                      fontSize: windowSize.width < 768 ? '1rem' : '1.125rem'
+                    }}>
+                      {children}
+                    </p>
+                  ),
                 }}>
-                  {article.author.name}
-                </p>
+                  {article.content}
+                </ReactMarkdown>
+              ) : (
+                <p>No content available for this article.</p>
               )}
-              
-              <p style={{ 
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontSize: windowSize.width < 768 ? '0.9rem' : '1rem',
-                margin: 0,
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)'
-              }}>
-                {publishDate}
-              </p>
             </div>
-          </div>
+      
+            {/* Categories */}
+            {article.categories && article.categories.length > 0 && (
+              <div style={{ 
+                marginTop: '3rem', 
+                paddingTop: '1.5rem', 
+                borderTop: '1px solid #eee',
+                paddingRight: '20px',
+                maxWidth: '100%'
+              }}>
+                <h2 style={{ 
+                  fontSize: '1.25rem', 
+                  fontWeight: '600', 
+                  marginBottom: '1rem',
+                  color: '#444'
+                }}>Categories</h2>
+                <div style={{ 
+                  display: 'flex', 
+                  flexWrap: 'wrap', 
+                  gap: '0.5rem' 
+                }}>
+                  {article.categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      href={`/categories/${category.slug || category.id}`}
+                      style={{ 
+                        backgroundColor: '#FFE8C9', 
+                        color: '#773800',
+                        padding: windowSize.width < 480 ? '0.4rem 0.8rem' : '0.5rem 1rem', 
+                        borderRadius: '2rem', 
+                        fontSize: windowSize.width < 480 ? '0.8rem' : '0.875rem',
+                        textDecoration: 'none',
+                        fontWeight: '500'
+                      }}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </article>
         </div>
       </div>
-      
-      {/* Article Content Section */}
-      <article style={{ 
-        maxWidth: '800px', 
-        margin: '0 auto', 
-        padding: '40px 20px 60px'
-      }}>
-        {/* Article content with proper styling - Using content field */}
-        <div style={{ margin: '0 auto' }} className="markdown-content">
-          {article.content ? (
-            <ReactMarkdown components={{
-              ...components,
-              // Override some components for responsive design
-              h1: ({ children }) => (
-                <h1 style={{
-                  fontSize: windowSize.width < 768 ? '1.75rem' : '2.25rem', 
-                  fontWeight: 'bold', 
-                  margin: '2rem 0 1rem', 
-                  color: '#444'
-                }}>
-                  {children}
-                </h1>
-              ),
-              h2: ({ children }) => (
-                <h2 style={{
-                  fontSize: windowSize.width < 768 ? '1.5rem' : '1.875rem', 
-                  fontWeight: 'bold', 
-                  margin: '1.75rem 0 1rem', 
-                  color: '#444'
-                }}>
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 style={{
-                  fontSize: windowSize.width < 768 ? '1.25rem' : '1.5rem', 
-                  fontWeight: 'bold', 
-                  margin: '1.5rem 0 0.75rem', 
-                  color: '#444'
-                }}>
-                  {children}
-                </h3>
-              ),
-              p: ({ children }) => (
-                <p style={{
-                  margin: '1.25rem 0', 
-                  lineHeight: '1.7', 
-                  color: '#444', 
-                  fontSize: windowSize.width < 768 ? '1rem' : '1.125rem'
-                }}>
-                  {children}
-                </p>
-              ),
-            }}>
-              {article.content}
-            </ReactMarkdown>
-          ) : (
-            <p>No content available for this article.</p>
-          )}
-        </div>
-  
-        {/* Categories */}
-        {article.categories && article.categories.length > 0 && (
-          <div style={{ 
-            marginTop: '3rem', 
-            paddingTop: '1.5rem', 
-            borderTop: '1px solid #eee' 
-          }}>
-            <h2 style={{ 
-              fontSize: '1.25rem', 
-              fontWeight: '600', 
-              marginBottom: '1rem',
-              color: '#444'
-            }}>Categories</h2>
-            <div style={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              gap: '0.5rem' 
-            }}>
-              {article.categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/categories/${category.slug || category.id}`}
-                  style={{ 
-                    backgroundColor: '#FFE8C9', 
-                    color: '#773800',
-                    padding: windowSize.width < 480 ? '0.4rem 0.8rem' : '0.5rem 1rem', 
-                    borderRadius: '2rem', 
-                    fontSize: windowSize.width < 480 ? '0.8rem' : '0.875rem',
-                    textDecoration: 'none',
-                    fontWeight: '500'
-                  }}
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </article>
     </ArticleLayout>
   );
 }
