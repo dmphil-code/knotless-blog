@@ -124,9 +124,9 @@ export default function ArticleDetail() {
         </div>
       );
     },
-    h1: ({ children }) => <h1 style={{fontSize: '2.25rem', fontWeight: 'bold', margin: '2rem 0 1rem', color: '#444'}}>{children}</h1>,
-    h2: ({ children }) => <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', margin: '1.75rem 0 1rem', color: '#444'}}>{children}</h2>,
-    h3: ({ children }) => <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', margin: '1.5rem 0 0.75rem', color: '#444'}}>{children}</h3>,
+    h1: ({ children }) => <h1 style={{fontSize: '2.25rem', fontWeight: 'bold', margin: '2rem 0 1rem', color: '#444', fontFamily: "'Bauhaus Soft Display', sans-serif" }}>{children}</h1>,
+    h2: ({ children }) => <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', margin: '1.75rem 0 1rem', color: '#444', fontFamily: "'Bauhaus Soft Display', sans-serif" }}>{children}</h2>,
+    h3: ({ children }) => <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', margin: '1.5rem 0 0.75rem', color: '#444', fontFamily: "'Bauhaus Soft Display', sans-serif" }}>{children}</h3>,
     p: ({ children }) => <p style={{margin: '1.25rem 0', lineHeight: '1.7', color: '#444', fontSize: '1.125rem'}}>{children}</p>,
     ul: ({ children }) => <ul style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'disc'}}>{children}</ul>,
     ol: ({ children }) => <ol style={{marginLeft: '1.5rem', marginBottom: '1.25rem', listStyleType: 'decimal'}}>{children}</ol>,
@@ -311,10 +311,10 @@ export default function ArticleDetail() {
             position: 'absolute',
             top: 0,
             bottom: 0,
-            left: windowSize.width < 1450 ? '-9999px' : 'calc((100% - 1000px) / 2 * 0.25)',
+            left: windowSize.width < 1440 ? '-9999px' : 'calc((100% - 1000px) / 2 * 0.25)',
             height: 'calc(100% + 2rem)', // Add the footer's top padding to perfectly align
             minHeight: '100%',
-            width: '120px',
+            width: '108px',
             pointerEvents: 'none',
             zIndex: 1,
             display: 'flex',
@@ -351,7 +351,7 @@ export default function ArticleDetail() {
               style={{
                 position: 'absolute',
                 top: '0',
-                left: '50%', // Center of column
+                left: '40%', // Center of column
                 transform: 'translateX(-50%)',
                 width: '80px',
                 height: 'auto',
@@ -365,7 +365,7 @@ export default function ArticleDetail() {
               style={{
                 position: 'absolute',
                 top: 'calc(33.3% + 2rem)',
-                left: '60%', // 10% to the right of center
+                left: '70%', // 10% to the right of center
                 transform: 'translateX(-50%)',
                 width: '80px',
                 height: 'auto',
@@ -379,7 +379,7 @@ export default function ArticleDetail() {
               style={{
                 position: 'absolute',
                 top: 'calc(66.6% + 2rem)',
-                left: '40%', // 10% to the left of center
+                left: '35%', // 10% to the left of center
                 transform: 'translateX(-50%)',
                 width: '80px',
                 height: 'auto',
@@ -405,7 +405,8 @@ export default function ArticleDetail() {
                       fontSize: windowSize.width < 768 ? '1.75rem' : '2.25rem', 
                       fontWeight: 'bold', 
                       margin: '2rem 0 1rem', 
-                      color: '#444'
+                      color: '#444',
+                      fontFamily: "'Bauhaus Soft Display', sans-serif" 
                     }}>
                       {children}
                     </h1>
@@ -415,7 +416,8 @@ export default function ArticleDetail() {
                       fontSize: windowSize.width < 768 ? '1.5rem' : '1.875rem', 
                       fontWeight: 'bold', 
                       margin: '1.75rem 0 1rem', 
-                      color: '#444'
+                      color: '#444',
+                      fontFamily: "'Bauhaus Soft Display', sans-serif" 
                     }}>
                       {children}
                     </h2>
@@ -425,7 +427,8 @@ export default function ArticleDetail() {
                       fontSize: windowSize.width < 768 ? '1.25rem' : '1.5rem', 
                       fontWeight: 'bold', 
                       margin: '1.5rem 0 0.75rem', 
-                      color: '#444'
+                      color: '#444',
+                      fontFamily: "'Bauhaus Soft Display', sans-serif" 
                     }}>
                       {children}
                     </h3>

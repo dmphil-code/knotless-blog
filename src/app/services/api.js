@@ -32,7 +32,7 @@ export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:d
       params: queryParams
     });
 
-    // console.log('Strapi response:', response.data);
+    console.log('Strapi response:', response.data);
     
     // Return the data as is - since your Strapi doesn't use the attributes structure
     return {
