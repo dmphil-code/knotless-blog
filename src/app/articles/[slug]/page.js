@@ -462,7 +462,9 @@ export default function ArticleDetail() {
                   fontSize: '1.25rem', 
                   fontWeight: '600', 
                   marginBottom: '1rem',
-                  color: '#444'
+                  marginTop:'1rem',
+                  color: '#444',
+                  fontFamily: "'Bauhaus Soft Display', sans-serif"
                 }}>Categories</h2>
                 <div style={{ 
                   display: 'flex', 
@@ -485,6 +487,58 @@ export default function ArticleDetail() {
                     >
                       {category.name}
                     </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+              {/* Affiliates */}
+              {article.affiliates && article.affiliates.length > 0 && (
+              <div style={{ 
+                marginTop: '1.5rem', 
+                paddingTop: '1.5rem'
+              }}>
+                <h2 style={{ 
+                  fontSize: '1.25rem', 
+                  fontWeight: '600', 
+                  marginBottom: '1rem',
+                  color: '#444',
+                  fontFamily: "'Bauhaus Soft Display', sans-serif"
+                }}>Recommended Products</h2>
+                <div style={{ 
+                  display: 'flex', 
+                  flexWrap: 'wrap', 
+                  gap: '0.5rem' 
+                }}>
+                  {article.affiliates.map((affiliate) => (
+                    <a
+                      key={affiliate.id}
+                      href={affiliate.url || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ 
+                        backgroundColor: '#F4B637', // Using secondary yellow color
+                        color: '#773800',
+                        padding: windowSize.width < 480 ? '0.4rem 0.8rem' : '0.5rem 1rem', 
+                        borderRadius: '2rem', 
+                        fontSize: windowSize.width < 480 ? '0.8rem' : '0.875rem',
+                        textDecoration: 'none',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {affiliate.name}
+                      {affiliate.company && (
+                        <span style={{
+                          marginLeft: '0.25rem',
+                          opacity: 0.8,
+                          fontSize: windowSize.width < 480 ? '0.7rem' : '0.75rem'
+                        }}>
+                          by {affiliate.company}
+                        </span>
+                      )}
+                    </a>
                   ))}
                 </div>
               </div>
