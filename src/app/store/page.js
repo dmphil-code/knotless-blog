@@ -1,69 +1,55 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { getAffiliateLinks } from '../services/api';
+import { getAffiliateLinks, getBrands } from '../services/api';
 import AffLinkCard from '../components/AffLinkCard';
 import StoreLayout from '../components/StoreLayout';
 import StoreHero from '../components/StoreHero';
-import Pagination from '../components/Pagination';
 import useWindowSize from '../../hooks/useWindowSize';
 
 export default function StorePage() {
   const windowSize = useWindowSize();
-  const [affiliates, setAffiliates] = useState([]);
+  
+  // State for different data categories
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [coupons, setCoupons] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 9, // 3x3 grid
-    total: 0,
-  });
 
-  // Determine optimal grid columns based on screen width
-  const getGridColumns = () => {
-    const width = windowSize.width || 0;
-    if (width >= 1200) return 3; // 3 columns on large screens
-    if (width >= 768) return 2;  // 2 columns on medium screens
-    return 1;                   // 1 column on small screens
-  };
-
-  // Fetch affiliate links from Strapi
-  const fetchAffiliateLinks = async (page = 1) => {
-    setLoading(true);
-    try {
-      const { data, meta } = await getAffiliateLinks(page, pagination.pageSize);
-      
-      if (data && data.length > 0) {
-        setAffiliates(data);
-      } else {
-        setAffiliates([]);
-      }
-      
-      setPagination(meta.pagination);
-    } catch (error) {
-      console.error("Error fetching affiliate links:", error);
-      setAffiliates([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle page change for pagination
-  const handlePageChange = (newPage) => {
-    fetchAffiliateLinks(newPage);
-    // Scroll to top when changing pages
-    window.scrollTo(0, 0);
-  };
-
-  // Fetch affiliate links on component mount
+  // Fetch all data on component mount
   useEffect(() => {
-    fetchAffiliateLinks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetch featured products (affiliates where featured=true)
+        const featuredResponse = await getAffiliateLinks(1, 100, 'name:asc', { featured: { $eq: true }});
+        setFeaturedProducts(featuredResponse.data || []);
+        
+        // Fetch coupons (affiliates where type=Coupon)
+        const couponsResponse = await getAffiliateLinks(1, 100, 'name:asc', { type: { $eq: 'Coupon' }});
+        setCoupons(couponsResponse.data || []);
+        
+        // Fetch all brands
+        const brandsResponse = await getBrands(1, 100, 'name:asc');
+        setBrands(brandsResponse.data || []);
+        
+        // Fetch promotions (affiliates where promotion=true)
+        const promotionsResponse = await getAffiliateLinks(1, 100, 'name:asc', { promotion: { $eq: true }});
+        setPromotions(promotionsResponse.data || []);
+      } catch (error) {
+        console.error("Error fetching store data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // Transform affiliate data to the structure expected by AffLinkCard
+  // Transform affiliate data for AffLinkCard
   const transformAffiliateData = (affiliate) => {
     if (!affiliate) {
-      console.warn('Invalid affiliate data:', affiliate);
       return null;
     }
     
@@ -73,20 +59,145 @@ export default function StorePage() {
       url: affiliate.url || '#',
       company: affiliate.company || '',
       slug: affiliate.slug || null,
-      articles: affiliate.articles || [],
-      categories: affiliate.categories || [],
-      author: affiliate.author || null
+      image: affiliate.image?.url || null,
+      // Add brand information if it exists
+      brand: affiliate.brand ? {
+        id: affiliate.brand.id,
+        name: affiliate.brand.name,
+        slug: affiliate.brand.slug
+      } : null
     };
   };
   
-  // Calculate max width based on grid columns
-  const getMaxWidth = () => {
-    const columns = getGridColumns();
-    // Account for gap (30px) between cards
-    if (columns === 1) return '320px'; // 1 card width
-    if (columns === 2) return '670px'; // (320px * 2) + 30px gap
-    return '1020px'; // (320px * 3) + (30px * 2) gaps
+  // Transform brand data for AffLinkCard
+  const transformBrandData = (brand) => {
+    if (!brand) {
+      return null;
+    }
+    
+    return {
+      id: brand.id,
+      name: brand.name || 'Unnamed Brand',
+      url: brand.url || '#',
+      description: brand.description || '',
+      slug: brand.slug || null,
+      image: brand.image?.url || null
+    };
   };
+  
+  // Get card width based on window size
+  const getCardWidth = () => {
+    const width = windowSize.width || 0;
+    if (width >= 1400) return 192; // 3/5 of 320
+    if (width >= 992) return 180;  // 3/5 of 300
+    if (width >= 768) return 168;  // 3/5 of 280
+    if (width >= 576) return 144;  // 3/5 of 240
+    return 132;                   // 3/5 of 220
+  };
+
+  // Render a section with title and scrollable row of cards
+  const renderSection = (title, items, transformFunction) => {
+    if (loading) {
+      // Loading state
+      return (
+        <div className="store-section" style={{ marginBottom: '50px' }}>
+          <h2 style={{ 
+            fontSize: '1.75rem', 
+            fontWeight: '600',
+            marginBottom: '1.5rem',
+            color: '#444',
+            fontFamily: "'Bauhaus Soft Display', sans-serif",
+            paddingLeft: '20px',
+            textAlign: 'left'
+          }}>{title}</h2>
+          
+          {/* Horizontal scrolling container */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row', // Ensure horizontal layout
+            overflowX: 'auto',
+            overflowY: 'hidden', // Prevent vertical scrolling
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#E9887E #f1f1f1',
+            padding: '10px 20px 20px',
+            WebkitOverflowScrolling: 'touch',
+            gap: '20px',
+            width: '100%'
+          }}>
+            {/* Loading placeholders */}
+            {Array(6).fill().map((_, i) => (
+              <div key={i} style={{
+                minWidth: `${getCardWidth()}px`,
+                width: `${getCardWidth()}px`,
+                height: `${getCardWidth()}px`,
+                backgroundColor: '#f5f5f5',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                flexShrink: 0
+              }}></div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    
+    // Skip empty sections
+    if (!items || items.length === 0) {
+      return null;
+    }
+    
+    return (
+      <div className="store-section" style={{ marginBottom: '50px' }}>
+        <h2 style={{ 
+          fontSize: '1.75rem', 
+          fontWeight: '600',
+          marginBottom: '1.5rem',
+          color: '#444',
+          fontFamily: "'Bauhaus Soft Display', sans-serif",
+          paddingLeft: '20px',
+          textAlign: 'left'
+        }}>{title}</h2>
+        
+        {/* Scrollable row container - explicitly set to row layout */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row', // Explicitly set row layout
+          flexWrap: 'nowrap', // Prevent wrapping
+          overflowX: 'auto',
+          overflowY: 'hidden', // Prevent vertical scrolling
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#E9887E #f1f1f1',
+          padding: '10px 20px 20px',
+          WebkitOverflowScrolling: 'touch',
+          gap: '20px',
+          width: '100%',
+          alignItems: 'stretch' // Ensure consistent height
+        }}>
+          {items.map((item) => {
+            const transformedItem = transformFunction(item);
+            if (!transformedItem) return null;
+            
+            const cardSize = getCardWidth();
+            
+            return (
+              <div key={item.id} style={{
+                minWidth: `${cardSize}px`,
+                width: `${cardSize}px`,
+                height: `${cardSize}px`,
+                flexShrink: 0,
+                display: 'inline-block' // Ensure block display
+              }}>
+                <AffLinkCard 
+                  affiliate={transformedItem} 
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   
   // Hero section title and description
   const heroTitle = "Our Affiliate Partners";
@@ -94,96 +205,55 @@ export default function StorePage() {
   
   return (
     <StoreLayout>
-      {/* Hero Section - Added at the top */}
+      {/* Hero Section */}
       <StoreHero 
         title={heroTitle} 
         description={heroDescription} 
       />
       
       <div style={{ 
-        maxWidth: '1200px', // Container max width
+        maxWidth: '1200px',
         margin: '0 auto',
-        padding: '0 2rem 3rem'
+        padding: '20px 0 3rem'
       }}>
-        {loading ? (
-          // Loading state
+        {/* Featured Products Section */}
+        {renderSection('Featured Products', featuredProducts, transformAffiliateData)}
+        
+        {/* Coupons Section */}
+        {renderSection('Coupons', coupons, transformAffiliateData)}
+        
+        {/* Brands Section */}
+        {renderSection('Brands', brands, transformBrandData)}
+        
+        {/* Sales & Promotions Section */}
+        {renderSection('Sales & Promotions', promotions, transformAffiliateData)}
+        
+        {/* Display "No content" message if all sections are empty and not loading */}
+        {!loading && 
+         featuredProducts.length === 0 && 
+         coupons.length === 0 && 
+         brands.length === 0 && 
+         promotions.length === 0 && (
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)`,
-            gap: '30px',
-            justifyContent: 'center',
-            margin: '0 auto',
-            maxWidth: getMaxWidth()
+            textAlign: 'center',
+            padding: '4rem 0',
+            maxWidth: '600px',
+            margin: '0 auto'
           }}>
-            {Array(Math.min(getGridColumns() * 3, 9)).fill().map((_, i) => (
-              <div key={i} style={{
-                width: '100%',
-                aspectRatio: '1 / 1',
-                backgroundColor: '#f5f5f5',
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              }}></div>
-            ))}
-          </div>
-        ) : (
-          affiliates.length > 0 ? (
-            <>
-              {/* Affiliate Links Grid */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${getGridColumns()}, 1fr)`,
-                gap: '30px',
-                justifyContent: 'center',
-                margin: '0 auto',
-                maxWidth: getMaxWidth()
-              }}>
-                {affiliates.map((affiliate) => {
-                  const transformedAffiliate = transformAffiliateData(affiliate);
-                  if (!transformedAffiliate) return null;
-                  
-                  return (
-                    <AffLinkCard 
-                      key={affiliate.id} 
-                      affiliate={transformedAffiliate} 
-                    />
-                  );
-                })}
-              </div>
-              
-              {/* Pagination */}
-              {pagination.total > pagination.pageSize && (
-                <div style={{ marginTop: '3rem' }}>
-                  <Pagination
-                    currentPage={pagination.page}
-                    totalPages={Math.ceil(pagination.total / pagination.pageSize)}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            // No affiliates available
-            <div style={{
-              textAlign: 'center',
-              padding: '4rem 0',
-              maxWidth: '600px',
-              margin: '0 auto'
+            <p style={{
+              fontSize: '1.25rem',
+              color: '#666',
+              marginBottom: '1.5rem'
             }}>
-              <p style={{
-                fontSize: '1.25rem',
-                color: '#666',
-                marginBottom: '1.5rem'
-              }}>
-                No affiliate links available at the moment.
-              </p>
-              <p style={{
-                fontSize: '1rem',
-                color: '#888'
-              }}>
-                Please check back later for recommendations.
-              </p>
-            </div>
-          )
+              No affiliate links or brands available at the moment.
+            </p>
+            <p style={{
+              fontSize: '1rem',
+              color: '#888'
+            }}>
+              Please check back later for recommendations.
+            </p>
+          </div>
         )}
         
         {/* Disclaimer */}
@@ -202,6 +272,28 @@ export default function StorePage() {
           </p>
         </div>
       </div>
+      
+      {/* Custom scrollbar styling for webkit browsers */}
+      <style jsx global>{`
+        /* Webkit scrollbar styling */
+        .store-section div::-webkit-scrollbar {
+          height: 6px;
+        }
+        
+        .store-section div::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        
+        .store-section div::-webkit-scrollbar-thumb {
+          background: #E9887E;
+          border-radius: 10px;
+        }
+        
+        .store-section div::-webkit-scrollbar-thumb:hover {
+          background: #d47068;
+        }
+      `}</style>
     </StoreLayout>
   );
 }

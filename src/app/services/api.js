@@ -217,3 +217,48 @@ export const getAffiliateLinkBySlug = async (slug) => {
     return null;
   }
 };
+
+
+// Fetching brands for storefront from brands collection
+export const getBrands = async (page = 1, pageSize = 10, sort = 'name:asc', filters = {}) => {
+  try {
+    // Build query parameters
+    const queryParams = {
+      sort,
+      pagination: {
+        page,
+        pageSize,
+      },
+      populate: '*' // Make sure to populate all fields including image
+    };
+
+    // Add filters if they exist
+    if (Object.keys(filters).length) {
+      queryParams.filters = filters;
+    }
+
+    console.log('Fetching brands with URL:', `${api.defaults.baseURL}/brands`);
+    console.log('Query params:', JSON.stringify(queryParams));
+
+    const response = await api.get('/brands', {
+      params: queryParams
+    });
+    
+    // Return the data structure matching the same pattern as other API functions
+    return {
+      data: response.data.data,
+      meta: response.data.meta,
+    };
+  } catch (error) {
+    console.error('Error fetching brands:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+      method: error.config?.method,
+      fullError: error
+    });
+    return { data: [], meta: { pagination: { page: 1, pageSize, total: 0 } } };
+  }
+};
