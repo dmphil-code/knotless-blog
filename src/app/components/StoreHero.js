@@ -2,60 +2,42 @@
 import React from 'react';
 import useWindowSize from '../../hooks/useWindowSize';
 
-const StoreHero = ({ title, description }) => {
+const StoreHero = () => {
   const windowSize = useWindowSize();
   
   return (
     <div className="store-hero-container" style={{
       position: 'relative',
       backgroundColor: '#222',
-      backgroundImage: 'url("/images/hero-background2.png")', // Different reference from main hero
+      backgroundImage: 'url("/images/store_hero4.jpg")', // New image path
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      backgroundBlendMode: 'soft-light',
-      color: 'white',
       width: '100%',
-      padding: '100px 2rem 80px',
+      height: windowSize.width < 768 ? '260px' : '350px', // Fixed height for better control
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign: 'center',
+      justifyContent: 'flex-end', // Position content at bottom
       marginBottom: '40px'
     }}>
-      {/* Title */}
-      <h1 style={{ 
-        fontSize: windowSize.width < 768 ? '2.5rem' : '3.5rem',
-        fontWeight: '700',
-        marginBottom: '1.5rem',
-        maxWidth: '800px',
-        textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
-      }}>
-        {title || 'Our Affiliates'}
-      </h1>
-      
-      {/* Description */}
-      {description && (
-        <p style={{
-          fontSize: windowSize.width < 768 ? '1.1rem' : '1.3rem',
-          fontWeight: '400',
-          maxWidth: '700px',
-          opacity: '0.9',
-          lineHeight: '1.6',
-          marginBottom: '1rem',
-          textShadow: '0 1px 5px rgba(0, 0, 0, 0.5)'
-        }}>
-          {description}
-        </p>
-      )}
-      
-      {/* Optional decorative element */}
       <div style={{
-        width: '80px',
-        height: '4px',
-        backgroundColor: '#E9887E',
-        margin: '25px auto 0'
-      }}></div>
+        maxWidth: '1200px',
+        width: '100%',
+        margin: '0 auto',
+        padding: '0 20px 40px', // Added bottom padding to move text up from very bottom
+      }}>
+        {/* Title - aligned with content sections */}
+        <h1 style={{ 
+          fontSize: windowSize.width < 768 ? '2.5rem' : '4rem',
+          fontWeight: '700',
+          color: 'white',
+          textShadow: '-1px -1px 0 #E9887E, 1px -1px 0 #E9887E, -1px 1px 0 #E9887E, 1px 1px 0 #E9887E', // Salmon outline
+          fontFamily: "'Bauhaus Soft Display', sans-serif", // Bauhaus font
+          margin: 0, // Remove default margin
+          lineHeight: 1.2
+        }}>
+          Knotless Store
+        </h1>
+      </div>
     </div>
   );
 };

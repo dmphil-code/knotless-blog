@@ -198,18 +198,12 @@ export default function StorePage() {
     );
   };
 
-  
-  // Hero section title and description
-  const heroTitle = "Our Affiliate Partners";
-  const heroDescription = "Check out these great products and services we recommend";
+
   
   return (
     <StoreLayout>
       {/* Hero Section */}
-      <StoreHero 
-        title={heroTitle} 
-        description={heroDescription} 
-      />
+      <StoreHero />
       
       <div style={{ 
         maxWidth: '1200px',
