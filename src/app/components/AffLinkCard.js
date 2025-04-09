@@ -2,52 +2,74 @@
 import React from 'react';
 import Link from 'next/link';
 
-const AffLinkCard = ({ affiliate }) => {
+const AffLinkCard = ({ affiliate, isWrappedInLink = false, onClick = null }) => {
   // Extract properties from affiliate object
   const { 
     name,
     url,
     company,
-    brand
+    brand,
+    image
   } = affiliate;
 
-  return (
-    <div style={{
-      width: '100%',       
-      height: '100%',      
-      cursor: 'pointer',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease',
-      borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      backgroundColor: '#FFE8C9',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '15px',
-      position: 'relative',
-      overflow: 'hidden',
-    }} className="aff-link-card">
-      <Link 
-        href={url || '#'} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        style={{ 
-          textDecoration: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+  // Determine if we have a valid image
+  const hasImage = Boolean(image);
+
+  // Create the card content
+  const cardContent = (
+    <>
+      {/* Background image - if available */}
+      {hasImage && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
           width: '100%',
           height: '100%',
-        }}
-      >
+          zIndex: 1,
+          overflow: 'hidden',
+          borderRadius: '12px'
+        }}>
+          <img 
+            src={image} 
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
+          />
+          {/* Dark overlay for better text visibility */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            zIndex: 2
+          }}></div>
+        </div>
+      )}
+      
+      {/* Content container - with higher z-index than the image */}
+      <div style={{
+        position: 'relative',
+        zIndex: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '15px',
+        width: '100%',
+        height: '100%',
+      }}>
         {/* Name */}
         <h3 style={{ 
           fontSize: '1.25rem',
           fontWeight: '600',
           textAlign: 'center',
-          color: '#773800',
+          color: hasImage ? 'white' : '#773800',
           margin: '0 0 8px 0',
           width: '100%',
           overflow: 'hidden',
@@ -55,6 +77,7 @@ const AffLinkCard = ({ affiliate }) => {
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
+          textShadow: hasImage ? '0 1px 2px rgba(0,0,0,0.5)' : 'none'
         }}>
           {name}
         </h3>
@@ -65,7 +88,7 @@ const AffLinkCard = ({ affiliate }) => {
             fontSize: '0.9rem',
             fontWeight: '400',
             textAlign: 'center',
-            color: '#9A6434',
+            color: hasImage ? 'rgba(255,255,255,0.9)' : '#9A6434',
             margin: '0 0 8px 0',
             width: '100%',
             overflow: 'hidden',
@@ -73,6 +96,7 @@ const AffLinkCard = ({ affiliate }) => {
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
+            textShadow: hasImage ? '0 1px 1px rgba(0,0,0,0.5)' : 'none'
           }}>
             {company}
           </p>
@@ -81,7 +105,7 @@ const AffLinkCard = ({ affiliate }) => {
         {/* Brand button (if it exists) */}
         {brand && brand.name && (
           <div style={{
-            backgroundColor: '#F4B637',
+            backgroundColor: hasImage ? 'rgba(255, 255, 255, 0.85)' : '#F4B637',
             color: '#773800',
             padding: '3px 10px',
             borderRadius: '12px',
@@ -93,11 +117,11 @@ const AffLinkCard = ({ affiliate }) => {
           </div>
         )}
         
-        {/* Visit link - always visible */}
+        {/* Visit/View button */}
         <div style={{
           position: 'absolute',
           bottom: '10px',
-          backgroundColor: 'rgba(255,255,255,0.8)',
+          backgroundColor: hasImage ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.8)',
           color: '#E9887E',
           textAlign: 'center',
           fontSize: '0.75rem',
@@ -107,9 +131,62 @@ const AffLinkCard = ({ affiliate }) => {
           opacity: 0,
           transition: 'opacity 0.3s ease',
         }} className="visit-link">
-          Visit
+          {isWrappedInLink ? 'View' : 'Visit'}
         </div>
-      </Link>
+      </div>
+    </>
+  );
+
+  return (
+    <div 
+      style={{
+        width: '100%',       
+        height: '100%',      
+        cursor: 'pointer',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        backgroundColor: hasImage ? 'transparent' : '#FFE8C9',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+      }} 
+      className={hasImage ? "aff-link-card-with-image" : "aff-link-card"}
+      onClick={onClick}
+    >
+      {/* If this component is already wrapped in a Link component, don't use another Link */}
+      {isWrappedInLink ? (
+        <div style={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          height: '100%',
+        }}>
+          {cardContent}
+        </div>
+      ) : (
+        <Link 
+          href={url || '#'} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ 
+            textDecoration: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          {cardContent}
+        </Link>
+      )}
 
       <style jsx>{`
         .aff-link-card:hover {
@@ -118,12 +195,18 @@ const AffLinkCard = ({ affiliate }) => {
           background-color: #E9887E;
         }
         
+        .aff-link-card-with-image:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
         .aff-link-card:hover h3,
         .aff-link-card:hover p {
           color: white;
         }
         
-        .aff-link-card:hover .visit-link {
+        .aff-link-card:hover .visit-link,
+        .aff-link-card-with-image:hover .visit-link {
           opacity: 1;
         }
       `}</style>

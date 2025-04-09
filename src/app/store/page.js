@@ -6,6 +6,7 @@ import AffLinkCard from '../components/AffLinkCard';
 import StoreLayout from '../components/StoreLayout';
 import StoreHero from '../components/StoreHero';
 import useWindowSize from '../../hooks/useWindowSize';
+import Link from 'next/link';
 
 export default function StorePage() {
   const windowSize = useWindowSize();
@@ -53,13 +54,21 @@ export default function StorePage() {
       return null;
     }
     
+    // Handle image URL - check if it exists and ensure it's a full URL
+    let imageUrl = null;
+    if (affiliate.image && affiliate.image.url) {
+      imageUrl = affiliate.image.url.startsWith('http') 
+        ? affiliate.image.url 
+        : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${affiliate.image.url}`;
+    }
+    
     return {
       id: affiliate.id,
       name: affiliate.name || 'Unnamed Affiliate',
       url: affiliate.url || '#',
       company: affiliate.company || '',
       slug: affiliate.slug || null,
-      image: affiliate.image?.url || null,
+      image: imageUrl,
       // Add brand information if it exists
       brand: affiliate.brand ? {
         id: affiliate.brand.id,
@@ -68,22 +77,30 @@ export default function StorePage() {
       } : null
     };
   };
-  
+
   // Transform brand data for AffLinkCard
   const transformBrandData = (brand) => {
-    if (!brand) {
-      return null;
-    }
-    
-    return {
-      id: brand.id,
-      name: brand.name || 'Unnamed Brand',
-      url: brand.url || '#',
-      description: brand.description || '',
-      slug: brand.slug || null,
-      image: brand.image?.url || null
-    };
+  if (!brand) {
+    return null;
+  }
+  
+  // Handle image URL - check if it exists and ensure it's a full URL
+  let imageUrl = null;
+  if (brand.image && brand.image.url) {
+    imageUrl = brand.image.url.startsWith('http') 
+      ? brand.image.url 
+      : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${brand.image.url}`;
+  }
+  
+  return {
+    id: brand.id,
+    name: brand.name || 'Unnamed Brand',
+    url: brand.url || '#',
+    description: brand.description || '',
+    slug: brand.slug || null,
+    image: imageUrl
   };
+};
   
   // Get card width based on window size
   const getCardWidth = () => {
@@ -217,7 +234,95 @@ export default function StorePage() {
         {renderSection('Coupons', coupons, transformAffiliateData)}
         
         {/* Brands Section */}
-        {renderSection('Brands', brands, transformBrandData)}
+        <div className="store-section" style={{ marginBottom: '50px' }}>
+          <h2 style={{ 
+            fontSize: '1.75rem', 
+            fontWeight: '600',
+            marginBottom: '1.5rem',
+            color: '#444',
+            fontFamily: "'Bauhaus Soft Display', sans-serif",
+            paddingLeft: '20px',
+            textAlign: 'left'
+          }}>Brands</h2>
+          
+          {/* Brands horizontal scroll container */}
+          {loading ? (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#E9887E #f1f1f1',
+              padding: '10px 20px 20px',
+              WebkitOverflowScrolling: 'touch',
+              gap: '20px',
+              width: '100%'
+            }}>
+              {/* Loading placeholders */}
+              {Array(6).fill().map((_, i) => (
+                <div key={i} style={{
+                  minWidth: `${getCardWidth()}px`,
+                  width: `${getCardWidth()}px`,
+                  height: `${getCardWidth()}px`,
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  flexShrink: 0
+                }}></div>
+              ))}
+            </div>
+          ) : brands.length === 0 ? (
+            <div style={{
+              padding: '20px',
+              textAlign: 'center',
+              color: '#666'
+            }}>
+              No brands available
+            </div>
+          ) : (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'nowrap',
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#E9887E #f1f1f1',
+              padding: '10px 20px 20px',
+              WebkitOverflowScrolling: 'touch',
+              gap: '20px',
+              width: '100%',
+              alignItems: 'stretch'
+            }}>
+              {brands.map((brand) => {
+                const transformedBrand = transformBrandData(brand);
+                if (!transformedBrand) return null;
+                
+                const cardSize = getCardWidth();
+                
+                return (
+                  <div
+                    key={brand.id}
+                    onClick={() => window.location.href = `/store/brand/${brand.slug || brand.id}`}
+                    style={{
+                      minWidth: `${cardSize}px`,
+                      width: `${cardSize}px`,
+                      height: `${cardSize}px`,
+                      flexShrink: 0,
+                      display: 'inline-block'
+                    }}
+                  >
+                    <AffLinkCard 
+                      affiliate={transformedBrand}
+                      isWrappedInLink={true}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
         
         {/* Sales & Promotions Section */}
         {renderSection('Sales & Promotions', promotions, transformAffiliateData)}
