@@ -7,6 +7,7 @@ import { getArticleBySlug, getArticleById } from '../../services/api';
 import ArticleLayout from '../../components/ArticleLayout';
 import ReactMarkdown from 'react-markdown';
 import useWindowSize from '../../hooks/useWindowSize';
+import { processRichTextContent } from '../../utils/richTextProcessor';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -98,8 +99,11 @@ export default function ArticleDetail() {
     if (!article.thumbnail || !article.thumbnail.url) return null;
     
     // Strapi Cloud serves media directly, so URLs will be complete
-  return article.thumbnail.url;
+    return article.thumbnail.url;
   };
+
+  // Get the processed content
+  const contentToDisplay = article.content ? processRichTextContent(article.content) : '';
 
   // Custom component mapping for ReactMarkdown
   const components = {
@@ -393,7 +397,7 @@ export default function ArticleDetail() {
           }}>
             {/* Article content */}
             <div className="markdown-content">
-              {article.content ? (
+              {contentToDisplay ? (
                 <ReactMarkdown components={{
                   ...components,
                   h1: ({ children }) => (
@@ -440,7 +444,7 @@ export default function ArticleDetail() {
                     </p>
                   ),
                 }}>
-                  {article.content}
+                  {contentToDisplay}
                 </ReactMarkdown>
               ) : (
                 <p>No content available for this article.</p>

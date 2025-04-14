@@ -5,9 +5,6 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337/api',
 });
 
-// At the top of your API service file
-// console.log('API Base URL being used:', process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337/api');
-
 // Get all articles with pagination, sorting, and filtering
 export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:desc', filters = {}) => {
   try {
@@ -26,13 +23,9 @@ export const getArticles = async (page = 1, pageSize = 10, sort = 'publishDate:d
       queryParams.filters = filters;
     }
 
-    // console.log('Query params for getArticles:', queryParams);
-
     const response = await api.get('/articles', {
       params: queryParams
     });
-
-    // console.log('Strapi response:', response.data);
     
     // Return the data as is - since your Strapi doesn't use the attributes structure
     return {
@@ -53,8 +46,6 @@ export const getArticleById = async (id) => {
         populate: '*',
       },
     });
-
-    // console.log('Article by ID response:', response.data);
     
     // Return the article data directly, not wrapped in response.data.data
     return response.data || null;
@@ -67,8 +58,6 @@ export const getArticleById = async (id) => {
 // Get a single article by slug
 export const getArticleBySlug = async (slug) => {
   try {
-    // console.log('Fetching article by slug:', slug);
-    
     const response = await api.get('/articles', {
       params: {
         filters: {
@@ -79,8 +68,6 @@ export const getArticleBySlug = async (slug) => {
         populate: '*',
       },
     });
-
-    // console.log('Article by slug response:', response.data);
     
     // Return the first article directly (not inside attributes)
     return response.data.data[0] || null;
@@ -121,8 +108,6 @@ export const searchArticles = async (query, page = 1, pageSize = 10) => {
         },
       },
     });
-
-    // console.log('Search results:', response.data);
 
     return {
       data: response.data.data,
@@ -218,7 +203,6 @@ export const getAffiliateLinkBySlug = async (slug) => {
   }
 };
 
-
 // Fetching brands for storefront from brands collection
 export const getBrands = async (page = 1, pageSize = 10, sort = 'name:asc', filters = {}) => {
   try {
@@ -236,9 +220,6 @@ export const getBrands = async (page = 1, pageSize = 10, sort = 'name:asc', filt
     if (Object.keys(filters).length) {
       queryParams.filters = filters;
     }
-
-    console.log('Fetching brands with URL:', `${api.defaults.baseURL}/brands`);
-    console.log('Query params:', JSON.stringify(queryParams));
 
     const response = await api.get('/brands', {
       params: queryParams
