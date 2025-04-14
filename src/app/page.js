@@ -112,13 +112,7 @@ export default function Home() {
     
     let imageUrl = null;
     if (article.thumbnail && article.thumbnail.url) {
-      // Check if URL already starts with http (absolute URL)
-      if (article.thumbnail.url.startsWith('http')) {
-        imageUrl = article.thumbnail.url;
-      } else {
-        // Otherwise prepend the Strapi URL
-        imageUrl = `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`;
-      }
+      imageUrl = article.thumbnail.url;
     }
   
     return {

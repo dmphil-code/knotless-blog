@@ -97,18 +97,14 @@ export default function ArticleDetail() {
   const getThumbnailUrl = () => {
     if (!article.thumbnail || !article.thumbnail.url) return null;
     
-    return article.thumbnail.url.startsWith('http') 
-      ? article.thumbnail.url 
-      : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.thumbnail.url}`;
+    // Strapi Cloud serves media directly, so URLs will be complete
+  return article.thumbnail.url;
   };
 
   // Custom component mapping for ReactMarkdown
   const components = {
     img: ({ src, alt, ...props }) => {
       // Handle internal image URLs
-      if (src && !src.startsWith('http')) {
-        src = `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${src}`;
-      }
       return (
         <div style={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
           <img 
@@ -119,7 +115,7 @@ export default function ArticleDetail() {
               borderRadius: '12px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
             }} 
-            {...props} 
+            {...props}  
           />
         </div>
       );

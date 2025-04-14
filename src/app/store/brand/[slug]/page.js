@@ -64,9 +64,7 @@ export default function BrandPage() {
     // Handle image URL - check if it exists and ensure it's a full URL
     let imageUrl = null;
     if (affiliate.image && affiliate.image.url) {
-      imageUrl = affiliate.image.url.startsWith('http') 
-        ? affiliate.image.url 
-        : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${affiliate.image.url}`;
+      imageUrl = affiliate.image.url;
     }
     
     return {
