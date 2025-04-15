@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getArticleBySlug, getArticleById } from '../../services/api';
+import { getArticleBySlug, getArticleById, getArticles } from '../../services/api';
 import ArticleLayout from '../../components/ArticleLayout';
 import ReactMarkdown from 'react-markdown';
 import useWindowSize from '../../hooks/useWindowSize';
 import { processRichTextContent } from '../../utils/richTextProcessor';
+import AffLinkCard from '../../components/AffLinkCard';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -15,10 +16,17 @@ export default function ArticleDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const windowSize = useWindowSize();
+  const [contentSections, setContentSections] = useState(['', '', '']);
+  const [prevArticle, setPrevArticle] = useState(null);
+  const [nextArticle, setNextArticle] = useState(null);
+  // State to track hover state for buttons
+  const [prevHovered, setPrevHovered] = useState(false);
+  const [nextHovered, setNextHovered] = useState(false);
   
   // Check if slug is a number (ID) or string (slug)
   const isId = !isNaN(Number(slug));
 
+  // Fetch article data
   useEffect(() => {
     if (!slug) return;
 
@@ -38,6 +46,14 @@ export default function ArticleDetail() {
           setError('Article not found');
         } else {
           setArticle(articleData);
+          
+          // Process content when article is loaded
+          const contentToDisplay = articleData.content ? processRichTextContent(articleData.content) : '';
+          const sections = splitContent(contentToDisplay);
+          setContentSections(sections);
+          
+          // Fetch all articles to determine prev/next
+          fetchAdjacentArticles(articleData.id);
         }
       } catch (err) {
         setError('Error loading article');
@@ -49,6 +65,62 @@ export default function ArticleDetail() {
 
     fetchArticle();
   }, [slug, isId]);
+
+  // Fetch adjacent articles for navigation
+  const fetchAdjacentArticles = async (currentId) => {
+    try {
+      // Get all articles
+      const { data: allArticles } = await getArticles(1, 100);
+      
+      if (!allArticles || allArticles.length === 0) return;
+      
+      // Sort articles by ID for consistent navigation
+      const sortedArticles = [...allArticles].sort((a, b) => a.id - b.id);
+      
+      // Find current article index
+      const currentIndex = sortedArticles.findIndex(article => article.id === currentId);
+      
+      if (currentIndex === -1) return;
+      
+      // Get previous article (or last if at beginning)
+      const prevIndex = currentIndex === 0 ? sortedArticles.length - 1 : currentIndex - 1;
+      setPrevArticle(sortedArticles[prevIndex]);
+      
+      // Get next article (or first if at end)
+      const nextIndex = currentIndex === sortedArticles.length - 1 ? 0 : currentIndex + 1;
+      setNextArticle(sortedArticles[nextIndex]);
+      
+    } catch (error) {
+      console.error("Error fetching adjacent articles:", error);
+    }
+  };
+
+  // Split content into three sections
+  const splitContent = (content) => {
+    if (!content) return ['', '', ''];
+    
+    const paragraphs = content.split('\n\n');
+    
+    if (paragraphs.length <= 3) {
+      // If 3 or fewer paragraphs, each one is a section
+      return paragraphs.concat(Array(3 - paragraphs.length).fill(''));
+    } else {
+      // Otherwise, distribute paragraphs evenly across 3 sections
+      const sectionSize = Math.ceil(paragraphs.length / 3);
+      
+      const section1 = paragraphs.slice(0, sectionSize).join('\n\n');
+      const section2 = paragraphs.slice(sectionSize, sectionSize * 2).join('\n\n');
+      const section3 = paragraphs.slice(sectionSize * 2).join('\n\n');
+      
+      return [section1, section2, section3];
+    }
+  };
+
+  // Get author image URL
+  const getAuthorImageUrl = () => {
+    if (!article || !article.author || !article.author.picture || !article.author.picture.url) return null;
+    return article.author.picture.url;
+  };
 
   if (loading) {
     return (
@@ -94,34 +166,33 @@ export default function ArticleDetail() {
       })
     : 'Unknown date';
 
-  // Image URL handling
-  const getThumbnailUrl = () => {
-    if (!article.thumbnail || !article.thumbnail.url) return null;
-    
-    // Strapi Cloud serves media directly, so URLs will be complete
-    return article.thumbnail.url;
-  };
-
-  // Get the processed content
-  const contentToDisplay = article.content ? processRichTextContent(article.content) : '';
-
   // Custom component mapping for ReactMarkdown
   const components = {
+    // IMPORTANT: Fix for the HTML validation error - img can't contain div
     img: ({ src, alt, ...props }) => {
-      // Handle internal image URLs
+      // Create smaller images with rounded corners
       return (
-        <div style={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
+        <span className="article-image-wrapper" style={{
+          display: 'block',
+          margin: '2rem auto',
+          maxWidth: '450px', // Increased to match wider content column
+          textAlign: 'center',
+        }}>
           <img 
             src={src} 
             alt={alt || ''} 
             style={{
-              maxWidth: '100%', 
-              borderRadius: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+              width: '100%', 
+              height: 'auto',
+              borderRadius: '12px', // Rounded corners
+              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+              border: '5px solid white',
+              maxHeight: '450px', // Increased to maintain proportion
+              objectFit: 'cover',
             }} 
             {...props}  
           />
-        </div>
+        </span>
       );
     },
     h1: ({ children }) => <h1 style={{fontSize: '2.25rem', fontWeight: 'bold', margin: '2rem 0 1rem', color: '#444', fontFamily: "'Bauhaus Soft Display', sans-serif" }}>{children}</h1>,
@@ -147,316 +218,362 @@ export default function ArticleDetail() {
 
   return (
     <ArticleLayout>
-      <div style={{ position: 'relative', width: '100%' }}>
-        {/* Hero section with background */}
+      <div style={{ position: 'relative', width: '100%', backgroundColor: 'white' }}>
+        {/* Main content container */}
         <div style={{ 
-          width: '100%',
-          marginTop: '-80px', // Negative margin to remove the gap from the header
-          paddingTop: '80px',  // Add back padding to maintain content position
-          position: 'relative',
-          background: 'url("/images/hero_section.png")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          zIndex: 1,
+          maxWidth: '1000px',
+          margin: '0 auto',
+          padding: '40px 20px 60px',
+          position: 'relative'
         }}>
-          {/* Hero content container */}
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '30px 20px 60px',
-            display: 'flex',
-            flexDirection: windowSize.width < 992 ? 'column' : 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '40px',
-          }}>
-            {/* Content column */}
-            <div style={{
-              flex: windowSize.width < 992 ? '1 1 100%' : '1 1 60%',
-              maxWidth: windowSize.width < 992 ? '100%' : '600px',
-              order: windowSize.width < 992 ? 2 : 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: windowSize.width < 992 ? 'center' : 'flex-start',
+          {/* Breadcrumb navigation - increased spacing */}
+          <div style={{ marginBottom: '60px' }}>
+            <Link 
+              href="/" 
+              style={{ 
+                color: '#E9887E',
+                textDecoration: 'none', 
+                display: 'flex',
+                alignItems: 'center',
+                fontWeight: '500',
+                fontSize: '1rem',
+              }}
+            >
+              <span style={{ marginRight: '6px' }}>←</span> Back to all articles
+            </Link>
+          </div>
+          
+          {/* Article title section */}
+          <div style={{ position: 'relative', marginBottom: '50px' }}>
+            {/* Title container - centered */}
+            <div style={{ 
+              textAlign: 'center',
+              margin: '0 auto',
+              width: '100%',
+              maxWidth: '850px'
             }}>
-              {/* Back link */}
-              <Link 
-                href="/" 
-                style={{ 
-                  color: '#E9887E',
-                  textDecoration: 'none', 
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontWeight: '500',
-                  fontSize: '1rem',
-                  marginBottom: '25px',
-                  textShadow: '0 1px 2px rgba(255,255,255,0.8)',
-                  background: 'rgba(255, 255, 255, 0.5)',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                }}
-              >
-                <span style={{ marginRight: '6px' }}>←</span> Back to all articles
-              </Link>
-              
-              {/* Title */}
               <h1 style={{ 
                 color: '#773800',
                 fontFamily: 'Bauhaus Soft Display, sans-serif',
-                fontSize: windowSize.width < 768 ? '1.75rem' : windowSize.width < 992 ? '2.25rem' : '2.75rem',
-                fontWeight: '600',
-                marginTop: '0',
-                marginBottom: '1.5rem',
+                fontSize: windowSize.width < 768 ? '2.5rem' : '3.5rem',
+                fontWeight: '700',
+                marginBottom: '30px',
                 lineHeight: '1.2',
-                textAlign: windowSize.width < 992 ? 'center' : 'left',
-                textShadow: '0 1px 3px rgba(255,255,255,0.8)',
               }}>
-                {article.title}
+                {article.title.toUpperCase()}
               </h1>
               
-              {/* Author and date */}
+              {/* Author and date container with image */}
               <div style={{
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                alignItems: windowSize.width < 992 ? 'center' : 'flex-start',
-                marginBottom: '20px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: '40px',
               }}>
-                {article.author && article.author.name && (
+                {/* Author image column */}
+                {getAuthorImageUrl() && (
+                  <div style={{
+                    marginRight: '15px',
+                  }}>
+                    <div style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                      border: '3px solid white',
+                    }}>
+                      <img
+                        src={getAuthorImageUrl()}
+                        alt={article.author.name || 'Author'}
+                        style={{ 
+                          width: '100%', 
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Author info column */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                  alignItems: getAuthorImageUrl() ? 'flex-start' : 'center',
+                }}>
+                  {article.author && article.author.name && (
+                    <p style={{ 
+                      color: '#773800',
+                      fontFamily: 'Bauhaus Soft Display, sans-serif',
+                      fontSize: windowSize.width < 768 ? '1.1rem' : '1.25rem',
+                      fontWeight: '500',
+                      margin: 0,
+                    }}>
+                      {article.author.name}
+                    </p>
+                  )}
+                  
                   <p style={{ 
                     color: '#773800',
                     fontFamily: 'Bauhaus Soft Display, sans-serif',
-                    fontSize: windowSize.width < 768 ? '1rem' : '1.125rem',
-                    fontWeight: '500',
+                    fontSize: windowSize.width < 768 ? '0.9rem' : '1rem',
                     margin: 0,
-                    textShadow: '0 1px 2px rgba(255,255,255,0.8)'
                   }}>
-                    {article.author.name}
+                    {publishDate}
                   </p>
-                )}
-                
-                <p style={{ 
-                  color: '#773800',
-                  fontFamily: 'Bauhaus Soft Display, sans-serif',
-                  fontSize: windowSize.width < 768 ? '0.9rem' : '1rem',
-                  margin: 0,
-                  textShadow: '0 1px 2px rgba(255,255,255,0.8)'
-                }}>
-                  {publishDate}
-                </p>
+                </div>
               </div>
             </div>
             
-            {/* Image column */}
+            {/* Navigation buttons - evenly spaced across full width */}
             <div style={{
-              flex: windowSize.width < 992 ? '1 1 100%' : '0 0 auto',
-              order: windowSize.width < 992 ? 1 : 2,
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              maxWidth: '850px',
+              margin: '0 auto 50px',
+              padding: '0'
             }}>
-              {getThumbnailUrl() ? (
-                <div style={{
-                  width: windowSize.width < 768 ? '200px' : '280px',
-                  height: windowSize.width < 768 ? '200px' : '280px',
+              {/* Previous Article button */}
+              <div 
+                className="nav-button-container"
+                onMouseEnter={() => setPrevHovered(true)}
+                onMouseLeave={() => setPrevHovered(false)}
+                style={{
                   position: 'relative',
-                }}>
-                  <div style={{
-                    width: '100%',
-                    height: '100%',
-                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
-                    border: '5px solid rgba(255, 255, 255, 0.9)',
-                    borderRadius: '50%',
-                  }}>
-                    <img
-                      src={getThumbnailUrl()}
-                      alt={article.title}
-                      style={{ 
-                        width: '100%', 
-                        height: '100%',
-                        objectFit: 'cover',
-                        borderRadius: '50%'
-                      }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div style={{
-                  width: windowSize.width < 768 ? '200px' : '280px',
-                  height: windowSize.width < 768 ? '200px' : '280px',
-                  backgroundColor: '#f5f5f5',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#666',
-                  border: '5px solid rgba(255, 255, 255, 0.9)',
-                }}>
-                  No image available
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        {/* Article content section with decorative lines */}
-        <div style={{ 
-          position: 'relative', 
-          backgroundColor: 'white',
-          boxShadow: '0 -10px 20px rgba(0,0,0,0.05)',
-          zIndex: 2,
-          padding: '40px 0 60px',
-        }}>
-          {/* Decorative lines - ONLY in content section */}
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: windowSize.width < 1440 ? '-9999px' : 'calc((100% - 1000px) / 2 * 0.25)',
-            height: 'calc(100% + 2rem)', // Add the footer's top padding to perfectly align
-            minHeight: '100%',
-            width: '108px',
-            pointerEvents: 'none',
-            zIndex: 1,
-            display: 'flex',
-            flexDirection: 'row'
-          }}>
-            {[...Array(3)].map((_, groupIndex) => (
-              ['#E9887E', '#F4B637', '#FFE8C9', '#773800'].map((color, colorIndex) => (
-                <div 
-                  key={`stripe-${groupIndex}-${colorIndex}`}
+                  overflow: 'hidden',
+                }}
+              >
+                <Link 
+                  href={prevArticle ? `/articles/${prevArticle.slug || prevArticle.id}` : '/'}
                   style={{ 
-                    flex: '1',
-                    height: '100%',
-                    backgroundColor: color
+                    backgroundColor: 'transparent',
+                    color: '#773800',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '2rem',
+                    textDecoration: 'none',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    border: '1px solid #773800',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    width: prevHovered && prevArticle ? 'auto' : 'auto',
+                    maxWidth: prevHovered && prevArticle ? '300px' : '170px',
+                    overflow: 'hidden'
                   }}
-                ></div>
-              ))
-            ))}
-          </div>
-
-          { /* Stars in the right column */}          
-          <div style={{
-            position: 'absolute',
-            top: '48px',
-            right: windowSize.width < 1450 ? '-9999px' : 'calc((100% - 1000px) / 2 * 0.25)',
-            height: '100%',
-            width: '120px',
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}>
-            {/* First star - top of container, center */}
-            <img 
-              src="/images/stars.png"
-              alt="Decorative star"
-              style={{
-                position: 'absolute',
-                top: '0',
-                left: '40%', // Center of column
-                transform: 'translateX(-50%)',
-                width: '80px',
-                height: 'auto',
-              }}
-            />
-            
-            {/* Second star - 1/3 of container height + 2rem, 10% right of center */}
-            <img 
-              src="/images/stars.png"
-              alt="Decorative star"
-              style={{
-                position: 'absolute',
-                top: 'calc(33.3% + 2rem)',
-                left: '70%', // 10% to the right of center
-                transform: 'translateX(-50%)',
-                width: '80px',
-                height: 'auto',
-              }}
-            />
-            
-            {/* Third star - 2/3 of container height + 2rem, 10% left of center */}
-            <img 
-              src="/images/stars.png"
-              alt="Decorative star"
-              style={{
-                position: 'absolute',
-                top: 'calc(66.6% + 2rem)',
-                left: '35%', // 10% to the left of center
-                transform: 'translateX(-50%)',
-                width: '80px',
-                height: 'auto',
-              }}
-            />
-          </div>
-
-          {/* Content container */}
-          <article style={{ 
-            maxWidth: '1000px',
-            margin: '0 auto',
-            padding: '0 20px',
-            position: 'relative',
-            zIndex: 2, // Above the decorative lines
-          }}>
-            {/* Article content */}
-            <div className="markdown-content">
-              {contentToDisplay ? (
-                <ReactMarkdown components={{
-                  ...components,
-                  h1: ({ children }) => (
-                    <h1 style={{
-                      fontSize: windowSize.width < 768 ? '1.75rem' : '2.25rem', 
-                      fontWeight: 'bold', 
-                      margin: '2rem 0 1rem', 
-                      color: '#444',
-                      fontFamily: "'Bauhaus Soft Display', sans-serif" 
+                >
+                  <span style={{ marginRight: '8px' }}>←</span> 
+                  {prevHovered && prevArticle ? (
+                    <span style={{
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap'
                     }}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 style={{
-                      fontSize: windowSize.width < 768 ? '1.5rem' : '1.875rem', 
-                      fontWeight: 'bold', 
-                      margin: '1.75rem 0 1rem', 
-                      color: '#444',
-                      fontFamily: "'Bauhaus Soft Display', sans-serif" 
+                      {prevArticle.title}
+                    </span>
+                  ) : (
+                    'Previous Article'
+                  )}
+                </Link>
+              </div>
+              
+              {/* Store button */}
+              <Link 
+                href="/store" 
+                style={{ 
+                  backgroundColor: '#E9887E',
+                  color: 'white',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '2rem',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  textAlign: 'center'
+                }}
+              >
+                Store
+              </Link>
+              
+              {/* Next Article button */}
+              <div 
+                className="nav-button-container"
+                onMouseEnter={() => setNextHovered(true)}
+                onMouseLeave={() => setNextHovered(false)}
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  textAlign: 'right'
+                }}
+              >
+                <Link 
+                  href={nextArticle ? `/articles/${nextArticle.slug || nextArticle.id}` : '/'}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    color: '#773800',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '2rem',
+                    textDecoration: 'none',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    border: '1px solid #773800',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    width: nextHovered && nextArticle ? 'auto' : 'auto',
+                    maxWidth: nextHovered && nextArticle ? '300px' : '170px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {nextHovered && nextArticle ? (
+                    <span style={{
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap'
                     }}>
-                      {children}
-                    </h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3 style={{
-                      fontSize: windowSize.width < 768 ? '1.25rem' : '1.5rem', 
-                      fontWeight: 'bold', 
-                      margin: '1.5rem 0 0.75rem', 
-                      color: '#444',
-                      fontFamily: "'Bauhaus Soft Display', sans-serif" 
-                    }}>
-                      {children}
-                    </h3>
-                  ),
-                  p: ({ children }) => (
-                    <p style={{
-                      margin: '1.25rem 0', 
-                      lineHeight: '1.7', 
-                      color: '#444', 
-                      fontSize: windowSize.width < 768 ? '1rem' : '1.125rem'
-                    }}>
-                      {children}
-                    </p>
-                  ),
-                }}>
-                  {contentToDisplay}
-                </ReactMarkdown>
-              ) : (
-                <p>No content available for this article.</p>
-              )}
+                      {nextArticle.title}
+                    </span>
+                  ) : (
+                    'Next Article'
+                  )}
+                  <span style={{ marginLeft: '8px' }}>→</span>
+                </Link>
+              </div>
             </div>
-      
+          </div>
+          
+          {/* Main article content - centered */}
+          <div style={{ 
+            maxWidth: '850px', 
+            margin: '0 auto', 
+            position: 'relative'
+          }}>
+            {/* Section 1 */}
+            <div className="article-section" style={{ 
+              marginBottom: article.excerpt ? '70px' : '30px',
+            }}>
+              <ReactMarkdown components={components}>
+                {contentSections[0]}
+              </ReactMarkdown>
+            </div>
+            
+            {/* Article excerpt if available - between sections 1 and 2 */}
+            {article.excerpt ? (
+              <div style={{
+                marginBottom: '70px',
+                padding: '20px 40px',
+                backgroundColor: '#FFF8F0',
+                borderRadius: '8px',
+                textAlign: 'center'
+              }}>
+                <h3 style={{
+                  fontFamily: "'Bauhaus Soft Display', sans-serif",
+                  fontSize: windowSize.width < 768 ? '1.75rem' : '2.25rem',
+                  fontWeight: '600',
+                  color: '#773800',
+                  lineHeight: '1.3',
+                  marginBottom: '10px'
+                }}>
+                  {article.excerpt}
+                </h3>
+              </div>
+            ) : null}
+            
+            {/* Section 2 */}
+            {contentSections[1] && (
+              <div className="article-section" style={{ 
+                marginBottom: '70px',
+              }}>
+                <ReactMarkdown components={components}>
+                  {contentSections[1]}
+                </ReactMarkdown>
+              </div>
+            )}
+            
+            {/* Products We Love section - in a colored container between sections 2 and 3 */}
+            {article.affiliates && article.affiliates.length > 0 && (
+              <div style={{
+                marginBottom: '70px',
+                padding: '30px',
+                backgroundColor: '#FFF8F0', // Same as excerpt
+                borderRadius: '8px',
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.2rem', 
+                  fontWeight: '600', 
+                  marginBottom: '1.5rem',
+                  color: '#773800',
+                  fontFamily: "'Bauhaus Soft Display', sans-serif",
+                  textAlign: 'left'
+                }}>Products We Love</h3>
+                
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  gap: '20px',
+                  justifyContent: 'flex-start'
+                }}>
+                  {article.affiliates.slice(0, 3).map((affiliate, index) => (
+                    <div key={affiliate.id} style={{
+                      height: '200px',
+                      width: article.affiliates.length === 1 
+                        ? '280px' 
+                        : windowSize.width < 768 
+                          ? '100%' 
+                          : `calc(${100 / Math.min(article.affiliates.length, 3)}% - ${article.affiliates.length > 1 ? '15px' : '0px'})`
+                    }}>
+                      <AffLinkCard 
+                        affiliate={{
+                          id: affiliate.id,
+                          name: affiliate.name || 'Recommended Product',
+                          url: affiliate.url || '#',
+                          company: affiliate.company || '',
+                          image: affiliate.image?.url || null,
+                          brand: affiliate.brand || null
+                        }} 
+                      />
+                    </div>
+                  ))}
+                </div>
+                
+                {article.affiliates.length > 3 && (
+                  <div style={{ marginTop: '15px' }}>
+                    <Link 
+                      href="/store" 
+                      style={{
+                        display: 'inline-block',
+                        color: '#E9887E',
+                        textDecoration: 'none',
+                        fontSize: '0.9rem',
+                        fontWeight: '500'
+                      }}
+                    >
+                      View all recommended products →
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Section 3 */}
+            {contentSections[2] && (
+              <div className="article-section">
+                <ReactMarkdown components={components}>
+                  {contentSections[2]}
+                </ReactMarkdown>
+              </div>
+            )}
+            
             {/* Categories */}
             {article.categories && article.categories.length > 0 && (
               <div style={{ 
                 marginTop: '3rem', 
                 paddingTop: '1.5rem', 
-                borderTop: '1px solid #eee',
+                borderTop: '1px solid #eee'
               }}>
                 <h2 style={{ 
                   fontSize: '1.25rem', 
@@ -491,59 +608,7 @@ export default function ArticleDetail() {
                 </div>
               </div>
             )}
-
-              {/* Affiliates */}
-              {article.affiliates && article.affiliates.length > 0 && (
-              <div style={{ 
-                marginTop: '1.5rem', 
-                paddingTop: '1.5rem'
-              }}>
-                <h2 style={{ 
-                  fontSize: '1.25rem', 
-                  fontWeight: '600', 
-                  marginBottom: '1rem',
-                  color: '#444',
-                  fontFamily: "'Bauhaus Soft Display', sans-serif"
-                }}>Recommended Products</h2>
-                <div style={{ 
-                  display: 'flex', 
-                  flexWrap: 'wrap', 
-                  gap: '0.5rem' 
-                }}>
-                  {article.affiliates.map((affiliate) => (
-                    <a
-                      key={affiliate.id}
-                      href={affiliate.url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ 
-                        backgroundColor: '#F4B637', // Using secondary yellow color
-                        color: '#773800',
-                        padding: windowSize.width < 480 ? '0.4rem 0.8rem' : '0.5rem 1rem', 
-                        borderRadius: '2rem', 
-                        fontSize: windowSize.width < 480 ? '0.8rem' : '0.875rem',
-                        textDecoration: 'none',
-                        fontWeight: '500',
-                        display: 'flex',
-                        alignItems: 'center'
-                      }}
-                    >
-                      {affiliate.name}
-                      {affiliate.company && (
-                        <span style={{
-                          marginLeft: '0.25rem',
-                          opacity: 0.8,
-                          fontSize: windowSize.width < 480 ? '0.7rem' : '0.75rem'
-                        }}>
-                          by {affiliate.company}
-                        </span>
-                      )}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-          </article>
+          </div>
         </div>
       </div>
     </ArticleLayout>
