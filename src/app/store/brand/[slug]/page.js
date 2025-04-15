@@ -136,6 +136,17 @@ export default function BrandPage() {
               Store
             </Link>
             <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
+            <Link 
+              href="/store/categories?category=brands" 
+              style={{
+                color: '#666',
+                textDecoration: 'none',
+                fontSize: '0.9rem'
+              }}
+            >
+              Brands
+            </Link>
+            <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
             <span style={{ color: '#999', fontSize: '0.9rem' }}>Loading...</span>
           </div>
           
@@ -185,6 +196,17 @@ export default function BrandPage() {
               Store
             </Link>
             <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
+            <Link 
+              href="/store/categories?category=brands" 
+              style={{
+                color: '#666',
+                textDecoration: 'none',
+                fontSize: '0.9rem'
+              }}
+            >
+              Brands
+            </Link>
+            <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
             <span style={{ color: '#999', fontSize: '0.9rem' }}>Brand not found</span>
           </div>
           
@@ -210,7 +232,7 @@ export default function BrandPage() {
               We couldn't find the brand you're looking for.
             </p>
             <Link 
-              href="/store" 
+              href="/store/categories?category=brands" 
               style={{
                 backgroundColor: '#E9887E',
                 color: 'white',
@@ -221,7 +243,7 @@ export default function BrandPage() {
                 display: 'inline-block'
               }}
             >
-              Return to Store
+              View All Brands
             </Link>
           </div>
         </div>
@@ -239,7 +261,7 @@ export default function BrandPage() {
         margin: '1.5rem auto',
         padding: '0 20px'
       }}>
-        {/* Breadcrumb */}
+        {/* Breadcrumb - Updated with link to Brands category */}
         <div style={{
           marginBottom: '2rem',
           padding: '0.5rem 0'
@@ -253,6 +275,17 @@ export default function BrandPage() {
             }}
           >
             Store
+          </Link>
+          <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
+          <Link 
+            href="/store/categories?category=brands" 
+            style={{
+              color: '#666',
+              textDecoration: 'none',
+              fontSize: '0.9rem'
+            }}
+          >
+            Brands
           </Link>
           <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
           <span style={{ color: '#999', fontSize: '0.9rem' }}>{brand.name}</span>
