@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getAffiliateLinks, getBrands } from '../../services/api';
@@ -18,7 +18,23 @@ const categories = [
   { id: 6, title: "Beauty", slug: "beauty", queryType: "categories", queryValue: "Beauty" }
 ];
 
-export default function CategoriesPage() {
+// Loading fallback component
+function LoadingPlaceholder() {
+  return (
+    <div style={{
+      padding: '2rem',
+      textAlign: 'center',
+      backgroundColor: '#f9f9f9',
+      borderRadius: '12px',
+      color: '#666'
+    }}>
+      <p>Loading category data...</p>
+    </div>
+  );
+}
+
+// Main component content separated from search params logic
+function CategoryContent() {
   const windowSize = useWindowSize();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category') || 'brands'; // Default to brands if no category is specified
@@ -132,165 +148,174 @@ export default function CategoriesPage() {
   };
 
   return (
-    <StoreLayout>
+    <div style={{
+      maxWidth: '1400px',
+      margin: '0 auto',
+      padding: '0 20px',
+      paddingTop: '40px' // Space after the header
+    }}>
+      {/* Breadcrumb */}
       <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '0 20px',
-        paddingTop: '40px' // Space after the header
+        marginBottom: '2rem',
+        padding: '0.5rem 0'
       }}>
-        {/* Breadcrumb */}
+        <Link 
+          href="/store" 
+          style={{
+            color: '#666',
+            textDecoration: 'none',
+            fontSize: '0.9rem'
+          }}
+        >
+          Store
+        </Link>
+        <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
+        <span style={{ color: '#999', fontSize: '0.9rem' }}>{currentBreadcrumb}</span>
+      </div>
+      
+      {/* Main content with two columns */}
+      <div style={{
+        display: 'flex',
+        flexDirection: windowSize.width < 768 ? 'column' : 'row',
+        gap: '30px'
+      }}>
+        {/* Left column - Categories list */}
         <div style={{
-          marginBottom: '2rem',
-          padding: '0.5rem 0'
+          width: windowSize.width < 768 ? '100%' : '250px',
+          flexShrink: 0
         }}>
-          <Link 
-            href="/store" 
-            style={{
-              color: '#666',
-              textDecoration: 'none',
-              fontSize: '0.9rem'
-            }}
-          >
-            Store
-          </Link>
-          <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
-          <span style={{ color: '#999', fontSize: '0.9rem' }}>{currentBreadcrumb}</span>
+          <h3 style={{
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginBottom: '1rem',
+            color: '#444',
+            fontFamily: "'Bauhaus Soft Display', sans-serif",
+          }}>
+            Categories
+          </h3>
+          
+          <ul style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0
+          }}>
+            {categories.map(category => (
+              <li key={category.id} style={{
+                marginBottom: '0.75rem'
+              }}>
+                <a 
+                  href={`/store/categories?category=${category.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCategoryClick(category);
+                  }}
+                  style={{
+                    textDecoration: 'none',
+                    color: category.slug === activeCategory ? '#E9887E' : '#444',
+                    fontWeight: category.slug === activeCategory ? '600' : '400',
+                    fontSize: '1rem',
+                    display: 'block',
+                    padding: '0.5rem 0',
+                    borderLeft: category.slug === activeCategory ? '3px solid #E9887E' : '3px solid transparent',
+                    paddingLeft: '10px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {category.title}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
         
-        {/* Main content with two columns */}
+        {/* Right column - Items grid */}
         <div style={{
-          display: 'flex',
-          flexDirection: windowSize.width < 768 ? 'column' : 'row',
-          gap: '30px'
+          flex: 1
         }}>
-          {/* Left column - Categories list */}
-          <div style={{
-            width: windowSize.width < 768 ? '100%' : '250px',
-            flexShrink: 0
+          <h2 style={{ 
+            fontSize: '1.75rem', 
+            fontWeight: '600',
+            marginBottom: '1.5rem',
+            color: '#444',
+            fontFamily: "'Bauhaus Soft Display', sans-serif",
           }}>
-            <h3 style={{
-              fontSize: '1.25rem',
-              fontWeight: '600',
-              marginBottom: '1rem',
-              color: '#444',
-              fontFamily: "'Bauhaus Soft Display', sans-serif",
-            }}>
-              Categories
-            </h3>
-            
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: 0
-            }}>
-              {categories.map(category => (
-                <li key={category.id} style={{
-                  marginBottom: '0.75rem'
-                }}>
-                  <a 
-                    href={`/store/categories?category=${category.slug}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleCategoryClick(category);
-                    }}
-                    style={{
-                      textDecoration: 'none',
-                      color: category.slug === activeCategory ? '#E9887E' : '#444',
-                      fontWeight: category.slug === activeCategory ? '600' : '400',
-                      fontSize: '1rem',
-                      display: 'block',
-                      padding: '0.5rem 0',
-                      borderLeft: category.slug === activeCategory ? '3px solid #E9887E' : '3px solid transparent',
-                      paddingLeft: '10px',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    {category.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {selectedCategory.title}
+          </h2>
           
-          {/* Right column - Items grid */}
-          <div style={{
-            flex: 1
-          }}>
-            <h2 style={{ 
-              fontSize: '1.75rem', 
-              fontWeight: '600',
-              marginBottom: '1.5rem',
-              color: '#444',
-              fontFamily: "'Bauhaus Soft Display', sans-serif",
+          {loading ? (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 
+                windowSize.width < 576 ? '1fr' : 
+                windowSize.width < 992 ? 'repeat(2, 1fr)' : 
+                'repeat(3, 1fr)',
+              gap: '20px'
             }}>
-              {selectedCategory.title}
-            </h2>
-            
-            {loading ? (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 
-                  windowSize.width < 576 ? '1fr' : 
-                  windowSize.width < 992 ? 'repeat(2, 1fr)' : 
-                  'repeat(3, 1fr)',
-                gap: '20px'
-              }}>
-                {/* Loading placeholders */}
-                {Array(6).fill().map((_, i) => (
-                  <div key={i} style={{
-                    height: '200px',
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '12px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                  }}></div>
-                ))}
-              </div>
-            ) : items.length === 0 ? (
-              <div style={{
-                padding: '2rem',
-                textAlign: 'center',
-                backgroundColor: '#f9f9f9',
-                borderRadius: '12px',
-                color: '#666'
-              }}>
-                <p>No items found in this category.</p>
-              </div>
-            ) : (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 
-                  windowSize.width < 576 ? '1fr' : 
-                  windowSize.width < 992 ? 'repeat(2, 1fr)' : 
-                  'repeat(3, 1fr)',
-                gap: '20px'
-              }}>
-                {items.map(item => {
-                  // Transform data based on category type
-                  const transformedItem = selectedCategory.queryType === 'brands'
-                    ? transformBrandData(item)
-                    : transformAffiliateData(item);
-                    
-                  if (!transformedItem) return null;
+              {/* Loading placeholders */}
+              {Array(6).fill().map((_, i) => (
+                <div key={i} style={{
+                  height: '200px',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}></div>
+              ))}
+            </div>
+          ) : items.length === 0 ? (
+            <div style={{
+              padding: '2rem',
+              textAlign: 'center',
+              backgroundColor: '#f9f9f9',
+              borderRadius: '12px',
+              color: '#666'
+            }}>
+              <p>No items found in this category.</p>
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 
+                windowSize.width < 576 ? '1fr' : 
+                windowSize.width < 992 ? 'repeat(2, 1fr)' : 
+                'repeat(3, 1fr)',
+              gap: '20px'
+            }}>
+              {items.map(item => {
+                // Transform data based on category type
+                const transformedItem = selectedCategory.queryType === 'brands'
+                  ? transformBrandData(item)
+                  : transformAffiliateData(item);
                   
-                  return (
-                    <div key={item.id} style={{
-                      height: '200px'
-                    }}>
-                      <AffLinkCard 
-                        affiliate={transformedItem} 
-                        isWrappedInLink={selectedCategory.queryType === 'brands'}
-                        onClick={selectedCategory.queryType === 'brands' ? 
-                          () => window.location.href = `/store/brand/${item.slug || item.id}` : null}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                if (!transformedItem) return null;
+                
+                return (
+                  <div key={item.id} style={{
+                    height: '200px'
+                  }}>
+                    <AffLinkCard 
+                      affiliate={transformedItem} 
+                      isWrappedInLink={selectedCategory.queryType === 'brands'}
+                      onClick={selectedCategory.queryType === 'brands' ? 
+                        () => window.location.href = `/store/brand/${item.slug || item.id}` : null}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// Main page component with suspense boundary
+export default function CategoriesPage() {
+  return (
+    <StoreLayout>
+      <Suspense fallback={<LoadingPlaceholder />}>
+        <CategoryContent />
+      </Suspense>
     </StoreLayout>
   );
 }
