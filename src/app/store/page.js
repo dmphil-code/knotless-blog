@@ -1,19 +1,29 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { getAffiliateLinks } from '../services/api';
+import { useState, useEffect, useRef } from 'react';
+import { getAffiliateLinks, getBrands } from '../services/api';
 import AffLinkCard from '../components/AffLinkCard';
 import StoreLayout from '../components/StoreLayout';
 import useWindowSize from '../../hooks/useWindowSize';
 import Link from 'next/link';
 
-// Define categories outside the component to avoid redeclaration
+// Define categories for side menu (includes Beauty)
+const sideMenuCategories = [
+  { id: 1, title: "Coupons", slug: "coupons", queryType: "type", queryValue: "Coupon" },
+  { id: 2, title: "Brands", slug: "brands", queryType: "brands", queryValue: "all" },
+  { id: 3, title: "Sales & Promotions", slug: "sales-promotions", queryType: "promotion", queryValue: "true" },
+  { id: 4, title: "Hair Care", slug: "hair-care", queryType: "categories", queryValue: "Hair Care" },
+  { id: 5, title: "Skin Care", slug: "skin-care", queryType: "categories", queryValue: "Skin Care" },
+  { id: 6, title: "Beauty", slug: "beauty", queryType: "categories", queryValue: "Beauty" }
+];
+
+// Define categories for cards (without Sales & Promotions, with Beauty instead)
 const shopCategories = [
-  { id: 1, title: "Coupons", description: "Exclusive deals and discounts for your favorite products" },
-  { id: 2, title: "Brands", description: "Shop by your favorite beauty and hair care brands" },
-  { id: 3, title: "Hair Care", description: "Products for all hair types and styling needs" },
-  { id: 4, title: "Skin Care", description: "Nourish and enhance your skin's natural beauty" },
-  { id: 5, title: "Beauty", description: "Makeup and accessories for your beauty routine" }
+  { id: 1, title: "Coupons", slug: "coupons", queryType: "type", queryValue: "Coupon" },
+  { id: 2, title: "Brands", slug: "brands", queryType: "brands", queryValue: "all" },
+  { id: 3, title: "Beauty", slug: "beauty", queryType: "categories", queryValue: "Beauty" },
+  { id: 4, title: "Hair Care", slug: "hair-care", queryType: "categories", queryValue: "Hair Care" },
+  { id: 5, title: "Skin Care", slug: "skin-care", queryType: "categories", queryValue: "Skin Care" }
 ];
 
 export default function StorePage() {
@@ -22,6 +32,19 @@ export default function StorePage() {
   // State for featured products
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // States for category display
+  const [activeCategory, setActiveCategory] = useState('brands'); // Default to brands
+  const [categoryItems, setCategoryItems] = useState([]);
+  const [loadingCategory, setLoadingCategory] = useState(true);
+  
+  // Ref for category section scrolling
+  const categorySectionRef = useRef(null);
+
+  // Find the selected category object based on the active category
+  const selectedCategory = sideMenuCategories.find(cat => 
+    cat.slug === activeCategory || cat.title.toLowerCase() === activeCategory
+  ) || sideMenuCategories[1]; // Default to Brands
 
   // Fetch featured products on component mount
   useEffect(() => {
@@ -40,6 +63,66 @@ export default function StorePage() {
 
     fetchData();
   }, []);
+
+  // Fetch data based on the selected category
+  useEffect(() => {
+    const fetchCategoryData = async () => {
+      setLoadingCategory(true);
+      try {
+        if (selectedCategory.queryType === 'brands') {
+          // Fetch all brands
+          const brandsResponse = await getBrands(1, 12, 'name:asc'); // Limit to 12 items for homepage
+          setCategoryItems(brandsResponse.data || []);
+        } else {
+          // Fetch affiliates based on the category filter
+          const filterKey = selectedCategory.queryType;
+          const filterValue = selectedCategory.queryValue;
+          
+          const filterObject = {};
+          if (filterKey === 'categories') {
+            // Handle relational filtering for categories
+            filterObject['categories'] = {
+              name: {
+                $eq: filterValue
+              }
+            };
+          } else if (filterKey === 'type') {
+            filterObject[filterKey] = { $eq: filterValue };
+          } else if (filterKey === 'promotion') {
+            filterObject[filterKey] = { $eq: true };
+          }
+          
+          const response = await getAffiliateLinks(1, 12, 'name:asc', filterObject); // Limit to 12 items
+          setCategoryItems(response.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching category data:", error);
+        setCategoryItems([]);
+      } finally {
+        setLoadingCategory(false);
+      }
+    };
+
+    fetchCategoryData();
+  }, [selectedCategory]);
+
+  // Handle category selection
+  const handleCategoryClick = (category) => {
+    setActiveCategory(category.slug);
+    
+    // Scroll to the category section with offset for better viewing
+    if (categorySectionRef.current) {
+      // Get the element's position
+      const yOffset = -120; // Negative offset to position higher on the page
+      const element = categorySectionRef.current;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      
+      window.scrollTo({
+        top: y,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Function to transform affiliate data
   const transformAffiliateData = (affiliate) => {
@@ -66,6 +149,26 @@ export default function StorePage() {
         name: affiliate.brand.name,
         slug: affiliate.brand.slug
       } : null
+    };
+  };
+
+  // Transform brand data for AffLinkCard
+  const transformBrandData = (brand) => {
+    if (!brand) return null;
+    
+    // Handle image URL
+    let imageUrl = null;
+    if (brand.image && brand.image.url) {
+      imageUrl = brand.image.url;
+    }
+    
+    return {
+      id: brand.id,
+      name: brand.name || 'Unnamed Brand',
+      url: `/store/brand/${brand.slug || brand.id}`, // Link to the brand page
+      company: brand.description || '',
+      slug: brand.slug || null,
+      image: imageUrl
     };
   };
   
@@ -129,127 +232,99 @@ export default function StorePage() {
         margin: '0 auto',
         padding: '20px 0 3rem'
       }}>
-        {/* Category Cards Section using HeroArticleCard design */}
-        <div className="store-section" style={{ marginBottom: '50px' }}>
-          <h2 style={{ 
-            fontSize: '1.75rem', 
-            fontWeight: '600',
-            marginBottom: '1.5rem',
-            color: '#444',
-            fontFamily: "'Bauhaus Soft Display', sans-serif",
-            paddingLeft: '20px',
-            textAlign: 'left'
-          }}>Shop By Category</h2>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 
-              windowSize.width < 576 ? '1fr' : 
-              windowSize.width < 768 ? 'repeat(2, 1fr)' : 
-              windowSize.width < 992 ? 'repeat(3, 1fr)' : 
-              windowSize.width < 1200 ? 'repeat(4, 1fr)' : 
-              'repeat(5, 1fr)', // Showing all 5 cards in a row on large screens
-            gap: '20px',
-            padding: '0 20px'
-          }}>
-            {shopCategories.map(category => (
-              <div key={category.id} className="hero-article-card" style={{
-                position: 'relative',
-                height: '180px', // Reduced height to better fit 5 in a row
-                width: '100%',
-                overflow: 'visible',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-                borderRadius: '12px',
-                marginBottom: '20px',
-                backgroundColor: '#E9887E', // Salmon background color from brand guide
-                cursor: 'pointer',
-                border: '1px solid white' // White border like HeroArticleCard
-              }}>
-                {/* Content container */}
+        {/* Category Cards Section - without title */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 
+            windowSize.width < 576 ? '1fr' : 
+            windowSize.width < 768 ? 'repeat(2, 1fr)' : 
+            windowSize.width < 992 ? 'repeat(3, 1fr)' : 
+            windowSize.width < 1200 ? 'repeat(4, 1fr)' : 
+            'repeat(5, 1fr)', // Showing all 5 cards in a row on large screens
+          gap: '20px',
+          padding: '0 20px',
+          marginBottom: '3rem'
+        }}>
+          {shopCategories.map(category => {
+            // Determine the correct image path based on category
+            let imagePath = '';
+            switch(category.slug) {
+              case 'coupons':
+                imagePath = '/images/CategoryCard_Coupons.jpg';
+                break;
+              case 'brands':
+                imagePath = '/images/CategoryCard_Brands.jpg';
+                break;
+              case 'beauty':
+                imagePath = '/images/CategoryCard_Beauty.jpg';
+                break;
+              case 'hair-care':
+                imagePath = '/images/CategoryCard_Haircare.jpg';
+                break;
+              case 'skin-care':
+                imagePath = '/images/CategoryCard_Skincare.jpg';
+                break;
+              default:
+                imagePath = '/images/bump_salmon.png'; // Default fallback
+            }
+            
+            return (
+              <div key={category.id} style={{ textAlign: 'center' }}>
+                {/* Image Card - No overlay, clean design */}
                 <div style={{
                   position: 'relative',
-                  zIndex: 3,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '20px',
-                  height: '100%',
+                  height: '180px',
                   width: '100%',
+                  marginBottom: '12px',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                }}
+                onClick={() => {
+                  // Find corresponding category in sideMenuCategories
+                  const menuCategory = sideMenuCategories.find(cat => cat.slug === category.slug);
+                  if (menuCategory) {
+                    handleCategoryClick(menuCategory);
+                  }
                 }}>
-                  <h3 className="hero-article-title" style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '90%',
-                    zIndex: 2,
-                    textAlign: 'center',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    fontSize: '1.5rem',
-                    lineHeight: '1.3',
-                    margin: 0,
-                    padding: '10px',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
-                    letterSpacing: '1px',
-                    textTransform: 'uppercase',
-                  }}>
-                    {category.title}
-                  </h3>
-                  
-                  <div className="hero-read-more" style={{
-                    position: 'absolute',
-                    bottom: '-20px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    backgroundColor: '#E9887E',
-                    color: 'white',
-                    padding: '12px 25px',
-                    zIndex: 10,
-                    textAlign: 'center',
-                    fontWeight: '500',
-                    fontSize: '0.9rem',
-                    letterSpacing: '1px',
-                    textTransform: 'uppercase',
-                    borderRadius: '20px', // Added rounded edges to the bottom button
-                  }}>
-                    SHOP {/* Changed back to "SHOP" as requested */}
-                  </div>
+                  <img 
+                    src={imagePath}
+                    alt={category.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
                 </div>
                 
-                {/* Dark overlay for better text visibility */}
-                <div className="hero-overlay" style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
-                  zIndex: 1,
-                  borderRadius: '12px'
-                }}></div>
-                
-                {/* Removed description text as requested */}
-                
-                {/* Clickable link overlay - now linking to the categories page */}
-                <Link href={`/store/categories?category=${category.title.toLowerCase()}`} style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  zIndex: 4,
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  borderRadius: '12px'
-                }} aria-label={`Shop ${category.title}`}>
-                  <span style={{ display: 'none' }}>Shop {category.title}</span>
-                </Link>
+                {/* Category title below image */}
+                <h3 
+                  onClick={() => {
+                    // Same click handler as the image
+                    const menuCategory = sideMenuCategories.find(cat => cat.slug === category.slug);
+                    if (menuCategory) {
+                      handleCategoryClick(menuCategory);
+                    }
+                  }}
+                  style={{
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
+                    margin: '0',
+                    color: '#444',
+                    cursor: 'pointer',
+                    fontFamily: "'Bauhaus Soft Display', sans-serif"
+                  }}
+                >
+                  {category.title}
+                </h3>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
+
         
         {/* Featured Products Section - Only kept this row as requested */}
         <div className="store-section" style={{ marginBottom: '50px' }}>
@@ -337,6 +412,152 @@ export default function StorePage() {
           )}
         </div>
         
+        {/* Category Content Display Section (New) - Formatted like categories page */}
+      <div className="store-section" style={{ marginBottom: '50px' }} ref={categorySectionRef} id="brands">
+          {/* Main content with two columns */}
+          <div style={{
+            display: 'flex',
+            flexDirection: windowSize.width < 768 ? 'column' : 'row',
+            gap: '30px',
+            padding: '0 20px'
+          }}>
+            {/* Left column - Categories list */}
+            <div style={{
+              width: windowSize.width < 768 ? '100%' : '250px',
+              flexShrink: 0
+            }}>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                marginBottom: '1rem',
+                color: '#444',
+                fontFamily: "'Bauhaus Soft Display', sans-serif",
+              }}>
+                Categories
+              </h3>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                {sideMenuCategories.map(category => (
+                  <li key={category.id} style={{
+                    marginBottom: '0.75rem'
+                  }}>
+                    <a 
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleCategoryClick(category);
+                      }}
+                      style={{
+                        textDecoration: 'none',
+                        color: category.slug === activeCategory ? '#E9887E' : '#444',
+                        fontWeight: category.slug === activeCategory ? '600' : '400',
+                        fontSize: '1rem',
+                        display: 'block',
+                        padding: '0.5rem 0',
+                        borderLeft: category.slug === activeCategory ? '3px solid #E9887E' : '3px solid transparent',
+                        paddingLeft: '10px',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {category.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Right column - Items grid */}
+            <div style={{
+              flex: 1
+            }}>
+              <h2 style={{ 
+                fontSize: '1.75rem', 
+                fontWeight: '600',
+                marginBottom: '1.5rem',
+                color: '#444',
+                fontFamily: "'Bauhaus Soft Display', sans-serif",
+              }}>
+                {selectedCategory.title}
+              </h2>
+              
+              {loadingCategory ? (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 
+                    windowSize.width < 576 ? '1fr' : 
+                    windowSize.width < 992 ? 'repeat(2, 1fr)' : 
+                    'repeat(3, 1fr)',
+                  gap: '20px',
+                  height: '450px', // Fixed height for scrollable area
+                  overflowY: 'auto', // Make it scrollable
+                  paddingRight: '10px' // Space for scrollbar
+                }}>
+                  {/* Loading placeholders */}
+                  {Array(6).fill().map((_, i) => (
+                    <div key={i} style={{
+                      height: '200px',
+                      backgroundColor: '#f5f5f5',
+                      borderRadius: '12px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    }}></div>
+                  ))}
+                </div>
+              ) : categoryItems.length === 0 ? (
+                <div style={{
+                  padding: '2rem',
+                  textAlign: 'center',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '12px',
+                  color: '#666'
+                }}>
+                  <p>No items found in this category.</p>
+                </div>
+              ) : (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 
+                    windowSize.width < 576 ? '1fr' : 
+                    windowSize.width < 992 ? 'repeat(2, 1fr)' : 
+                    'repeat(3, 1fr)',
+                  gap: '20px',
+                  height: '450px', // Fixed height for scrollable area
+                  overflowY: 'auto', // Make it scrollable
+                  paddingRight: '10px', // Space for scrollbar
+                  // Custom scrollbar styling
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#E9887E #f1f1f1'
+                }}>
+                  {categoryItems.map(item => {
+                    // Transform data based on category type
+                    const transformedItem = selectedCategory.queryType === 'brands'
+                      ? transformBrandData(item)
+                      : transformAffiliateData(item);
+                      
+                    if (!transformedItem) return null;
+                    
+                    return (
+                      <div key={item.id} style={{
+                        height: '200px'
+                      }}>
+                        <AffLinkCard 
+                          affiliate={transformedItem} 
+                          isWrappedInLink={selectedCategory.queryType === 'brands'}
+                          onClick={selectedCategory.queryType === 'brands' ? 
+                            () => window.location.href = `/store/brand/${item.slug || item.id}` : null}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
         {/* Disclaimer - kept from original */}
         <div style={{
           margin: '4rem auto 1rem',
@@ -359,6 +580,7 @@ export default function StorePage() {
         /* Webkit scrollbar styling */
         .store-section div::-webkit-scrollbar {
           height: 6px;
+          width: 6px;
         }
         
         .store-section div::-webkit-scrollbar-track {
@@ -376,16 +598,17 @@ export default function StorePage() {
         }
         
         /* Add hover effects to the category cards */
-        .hero-article-card:hover {
+        div[style*="cursor: pointer"]:hover {
           transform: translateY(-5px);
-          box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
         
-        .hero-article-card:hover .hero-read-more {
-          background-color: #d47068;
+        h3[style*="cursor: pointer"]:hover {
+          color: #E9887E;
+        }
         }
       `}</style>
     </StoreLayout>
   );
 }
+

@@ -137,7 +137,7 @@ export default function BrandPage() {
             </Link>
             <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
             <Link 
-              href="/store/categories?category=brands" 
+              href="/store#brands" 
               style={{
                 color: '#666',
                 textDecoration: 'none',
@@ -197,7 +197,7 @@ export default function BrandPage() {
             </Link>
             <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
             <Link 
-              href="/store/categories?category=brands" 
+              href="/store#brands" 
               style={{
                 color: '#666',
                 textDecoration: 'none',
@@ -232,7 +232,7 @@ export default function BrandPage() {
               We couldn't find the brand you're looking for.
             </p>
             <Link 
-              href="/store/categories?category=brands" 
+              href="/store#brands" 
               style={{
                 backgroundColor: '#E9887E',
                 color: 'white',
@@ -261,7 +261,7 @@ export default function BrandPage() {
         margin: '1.5rem auto',
         padding: '0 20px'
       }}>
-        {/* Breadcrumb - Updated with link to Brands category */}
+        {/* Breadcrumb - Updated to link to store#brands instead of categories page */}
         <div style={{
           marginBottom: '2rem',
           padding: '0.5rem 0'
@@ -277,16 +277,37 @@ export default function BrandPage() {
             Store
           </Link>
           <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
-          <Link 
-            href="/store/categories?category=brands" 
+          <a 
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              // Navigate to store page first if not already there
+              if (window.location.pathname !== '/store') {
+                window.location.href = '/store#brands';
+                return;
+              }
+              
+              // If already on store page, just scroll to brands section
+              const brandsSection = document.getElementById('brands');
+              if (brandsSection) {
+                const yOffset = -120; // Same offset as in the store page
+                const y = brandsSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                
+                window.scrollTo({
+                  top: y,
+                  behavior: 'smooth'
+                });
+              }
+            }}
             style={{
               color: '#666',
               textDecoration: 'none',
-              fontSize: '0.9rem'
+              fontSize: '0.9rem',
+              cursor: 'pointer'
             }}
           >
             Brands
-          </Link>
+          </a>
           <span style={{ margin: '0 0.5rem', color: '#666' }}>/</span>
           <span style={{ color: '#999', fontSize: '0.9rem' }}>{brand.name}</span>
         </div>
