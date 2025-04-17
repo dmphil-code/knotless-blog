@@ -7,6 +7,100 @@ import StoreLayout from '../components/StoreLayout';
 import useWindowSize from '../../hooks/useWindowSize';
 import Link from 'next/link';
 
+// Featured Brand Cards Component
+const FeaturedBrandCards = () => {
+  const [featuredBrands, setFeaturedBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const windowSize = useWindowSize();
+
+  useEffect(() => {
+    const fetchFeaturedBrands = async () => {
+      setLoading(true);
+      try {
+        // Fetch brands where featured field is true
+        const brandsResponse = await getBrands(1, 6, 'name:asc', { featured: { $eq: true } });
+        setFeaturedBrands(brandsResponse.data || []);
+      } catch (error) {
+        console.error("Error fetching featured brands:", error);
+        setFeaturedBrands([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedBrands();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '15px',
+        flexWrap: 'wrap',
+        maxWidth: '90%'
+      }}>
+        {Array(4).fill().map((_, i) => (
+          <div key={i} style={{
+            width: '140px',
+            height: '60px',
+            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+            borderRadius: '8px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}></div>
+        ))}
+      </div>
+    );
+  }
+
+  if (featuredBrands.length === 0) {
+    return null; // Don't show anything if no featured brands
+  }
+
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '15px',
+      flexWrap: 'wrap',
+      maxWidth: '90%'
+    }}>
+      {featuredBrands.map(brand => (
+        <Link 
+          key={brand.id}
+          href={`/store/brand/${brand.slug || brand.id}`}
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 1)',
+            borderRadius: '8px',
+            padding: '10px 20px',
+            textDecoration: 'none',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minWidth: '180px',
+            height: '140px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+          className="featured-brand-card"
+        >
+          <span style={{
+            color: '#333',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: windowSize.width < 768 ? '1rem' : '1.25rem',
+            fontWeight: '700',
+            textAlign: 'center'
+          }}>
+            {brand.name}
+          </span>
+        </Link>
+      ))}
+    </div>
+  );
+};
+
 // Define categories for side menu (includes Beauty)
 const sideMenuCategories = [
   { id: 1, title: "Coupons", slug: "coupons", queryType: "type", queryValue: "Coupon" },
@@ -412,6 +506,47 @@ export default function StorePage() {
           )}
         </div>
         
+        {/* Featured Brands Banner - NEW SECTION */}
+        <div className="store-section" style={{ marginBottom: '50px', padding: '0 20px' }}>
+          <div className="relative w-full my-8" style={{ position: 'relative', width: '100%', margin: '2rem 0' }}>
+            <img 
+              src="/images/FeaturedBrands_Banner.png" 
+              alt="Featured Brands with Beauty Products" 
+              style={{ 
+                width: '100%', 
+                height: 'auto',
+                borderRadius: '8px'
+              }}
+            />
+            <div style={{ 
+              position: 'absolute', 
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              paddingTop: '30px'  // Add top padding for text
+            }}>
+              <h2 style={{ 
+                color: 'white',
+                fontFamily: 'Bauhaus, sans-serif',
+                fontSize: windowSize.width < 768 ? '1.5rem' : windowSize.width < 992 ? '3rem' : '3.5rem',
+                fontWeight: 'bold',
+                WebkitTextStroke: '2px #E9887E',
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                padding: '0 1rem',
+                textAlign: 'center',
+                marginBottom: '30px'
+              }}>
+                Get up to 50% off top brands!
+              </h2>
+              
+              {/* Featured Brand Cards */}
+              <FeaturedBrandCards />
+            </div>
+          </div>
+        </div>
+        
         {/* Category Content Display Section (New) - Formatted like categories page */}
       <div className="store-section" style={{ marginBottom: '50px' }} ref={categorySectionRef} id="brands">
           {/* Main content with two columns */}
@@ -606,9 +741,15 @@ export default function StorePage() {
         h3[style*="cursor: pointer"]:hover {
           color: #E9887E;
         }
+        
+        /* Add hover effects to the featured brand cards */
+        .featured-brand-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          background-color: white !important;
+        }
         }
       `}</style>
     </StoreLayout>
   );
 }
-
