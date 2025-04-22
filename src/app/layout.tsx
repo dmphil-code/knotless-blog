@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Knotless Blog",
   description: "Knotless Blog",
   icons: {
-    icon: { url: '/logo_favicon.png', type: 'image/png' }
+    icon: { url: '/Icon.svg', type: 'image/svg+xml' }
   }
 };
 
