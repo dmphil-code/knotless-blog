@@ -1,4 +1,4 @@
-// BaseLayout.js - Updated with side drawer mobile menu
+// BaseLayout.js - Complete implementation
 
 "use client"
 
@@ -16,6 +16,7 @@ export default function BaseLayout({
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const windowSize = useWindowSize();
   
   // Determine if the layout should use dark mode (for hero section)
@@ -42,6 +43,15 @@ export default function BaseLayout({
       setIsMobileMenuOpen(false);
     }
   }, [windowSize.width, isMobileMenuOpen]);
+
+  // Apply dark mode to body when toggled
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [darkMode]);
 
   // Calculate responsive padding values based on window size
   const getTopPadding = () => {
@@ -77,6 +87,11 @@ export default function BaseLayout({
     }
   };
 
+  // Toggle between dark and light mode
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   // Clear body style when component unmounts
   useEffect(() => {
     return () => {
@@ -84,223 +99,244 @@ export default function BaseLayout({
     };
   }, []);
 
-  // Colors based on page type and scroll state
-  const getHeaderBgColor = () => {
-    if (isScrolled) return '#E9887E';
-    if (pageType === 'home') return 'transparent';
-    return 'white';
-  };
-
-  const getTextColor = () => {
-    if (isScrolled) return 'white';
-    if (pageType === 'home') return 'white';
-    return '#333';
-  };
-
-  const getLogoColor = () => {
-    if (isScrolled) return 'white';
-    if (pageType === 'home') return 'white';
-    return '#E9887E';
-  };
-
-  const getSubtitleColor = () => {
-    if (isScrolled) return 'rgba(255, 255, 255, 0.9)';
-    if (pageType === 'home') return 'rgba(255, 255, 255, 0.9)';
-    return '#773800';
-  };
-
   return (
-    <div style={{ fontFamily: 'Montserrat, sans-serif' }}>
-      {/* Sticky Header */}
+    <div style={{ 
+      fontFamily: 'Montserrat, sans-serif',
+      backgroundColor: darkMode ? '#121212' : 'white',
+      color: darkMode ? 'white' : '#333',
+      transition: 'background-color 0.3s ease, color 0.3s ease',
+    }}>
+      {/* Sticky Header - Updated styling to match Header 2 */}
       <header className="site-header" style={{
-        backgroundColor: '#f5f5f5', // Light gray background
-        padding: '0.75rem 2rem',
+        backgroundColor: darkMode ? '#1a1a1a' : '#f8f8f8', // Lighter background color
+        padding: '0.5rem 0', // No horizontal padding for the header
         position: 'fixed',
         top: 0,
         left: 0,
-        height: '80px',
+        height: '80px', // Increased to 80px
         width: '100%',
         zIndex: 100,
         boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        transition: 'background-color 0.3s ease',
+        overflow: 'hidden' // Prevent logo overflow
       }}>
-        {/* Logo - Left aligned, enlarged */}
-        <div className="logo" style={{ display: 'flex', alignItems: 'center' }}>
-          <Link href="/" style={{ display: 'block' }}>
-            <img 
-              src="/images/main-logo1.png"
-              alt="Knotless Logo" 
-              style={{
-                height: '65px',
-                width: 'auto',
-                objectFit: 'contain'
-              }}
-            />
-          </Link>
-        </div>
-        
-        {/* Navigation Links - Only visible on non-mobile screens */}
-        <nav className="nav-links" style={{ 
-          display: windowSize.width >= 991 ? 'flex' : 'none',
+        {/* Parent row for logo and navigation */}
+        <div style={{ 
+          display: 'flex', 
           alignItems: 'center',
-          flex: 1,
-          marginLeft: '64px',
+          justifyContent: 'space-between', // Changed to space-between to push auth buttons to right
+          height: '100%',
+          width: '100%',
+          paddingLeft: windowSize.width >= 991 ? '6px' : '3px', // Minimal left padding for logo
+          paddingRight: windowSize.width >= 991 ? '6px' : '3px', // Minimal right padding for auth buttons
         }}>
-          <Link href="https://knotless.bookerhq.ca/home" className="nav-link" style={{
-            margin: '0 1.25rem',
-            textDecoration: 'none',
-            color: '#333',
-            fontSize: '14px',
-            fontFamily: 'Montserrat, sans-serif',
-            textTransform: 'capitalize'
-          }}>
-            Home
-          </Link>
-          <Link href="https://knotless.bookerhq.ca/aboutUs" className="nav-link" style={{
-            margin: '0 1.25rem',
-            textDecoration: 'none',
-            color: '#333',
-            fontSize: '14px',
-            fontFamily: 'Montserrat, sans-serif',
-            textTransform: 'capitalize'
-          }}>
-            About
-          </Link>
-          <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" className="nav-link" style={{
-            margin: '0 1.25rem',
-            textDecoration: 'none',
-            color: '#333',
-            fontSize: '14px',
-            fontFamily: 'Montserrat, sans-serif',
-            textTransform: 'capitalize'
-          }}>
-            Stylists
-          </Link>
-          <Link href="/" className="nav-link" style={{
-            margin: '0 1.25rem',
-            textDecoration: 'none',
-            color: '#333',
-            fontSize: '14px',
-            fontFamily: 'Montserrat, sans-serif',
-            textTransform: 'capitalize'
-          }}>
-            Blog
-          </Link>
-
-          <Link href="/store" className="nav-link" style={{
-            margin: '0 1.25rem',
-            textDecoration: 'none',
-            color: '#333',
-            fontSize: '14px',
-            fontFamily: 'Montserrat, sans-serif',
-            textTransform: 'capitalize'
-          }}>
-            Store
-          </Link>
-
-          <Link href="https://knotless.bookerhq.ca/contactUs" className="nav-link" style={{
-            margin: '0 1.25rem',
-            textDecoration: 'none',
-            color: '#333',
-            fontSize: '14px',
-            fontFamily: 'Montserrat, sans-serif',
-            textTransform: 'capitalize'
-          }}>
-            Contact Us
-          </Link>
-        </nav>
-        
-        {/* Auth Buttons and Mobile Menu Button Section */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          {/* Auth Buttons */}
-          <div className="auth-buttons" style={{
+          {/* Left section container for logo and nav */}
+          <div style={{
             display: 'flex',
             alignItems: 'center',
-            marginRight: windowSize.width < 991 ? '1rem' : '0'
+            height: '100%',
           }}>
-            <Link href="https://knotless.bookerhq.ca/login" style={{ marginRight: '0.75rem' }}>
-              <button style={{
-                background: '#F4B637', // Yellow color
-                color: '#333',
-                padding: '0 1.25rem',
-                borderRadius: '24px',
-                border: 'none',
-                height: '40px',
-                fontSize: '14px',
-                fontWeight: '400',
-                fontFamily: 'Montserrat, sans-serif',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                textTransform: 'capitalize'
+            {/* Logo container */}
+            <div className="logo" style={{ 
+              height: '100%', 
+              display: 'flex', 
+              alignItems: 'center',
+              marginRight: '48px', // 48px spacing between logo and nav
+              width: '200px', // Set a fixed width for the logo container
+              marginLeft: '0', // Remove any left margin
+            }}>
+              <Link href="/" style={{ 
+                display: 'block',
+                height: '100%',
+                width: '100%'
               }}>
-                Log In
-              </button>
-            </Link>
-            <Link href="https://knotless.bookerhq.ca/login">
-              <button style={{
-                background: '#E9887E',
-                color: 'white',
-                padding: '0 1.25rem',
-                borderRadius: '24px',
-                border: 'none',
-                height: '40px',
+                <img 
+                  src="/images/main-logo1.png"
+                  alt="Knotless Logo" 
+                  style={{
+                    height: 'auto', // Auto height
+                    width: '100%', // Fill the container width
+                    maxHeight: '78px', // Increased to match taller header
+                    objectFit: 'contain', // Changed back to contain for better quality
+                    transform: 'scale(1.3)', // Scale up the logo
+                    transformOrigin: 'left center', // Scale from left center
+                    marginTop: '-6px', // Push logo up by 6 pixels
+                  }}
+                />
+              </Link>
+            </div>
+            
+            {/* Navigation Links - Only visible on non-mobile screens */}
+            <nav className="nav-links" style={{ 
+              display: windowSize.width >= 991 ? 'flex' : 'none',
+              alignItems: 'center',
+              gap: '12px', // 12px spacing between nav items
+            }}>
+              <Link href="https://knotless.bookerhq.ca/home" className="nav-link" style={{
+                textDecoration: 'none',
+                color: darkMode ? '#e0e0e0' : '#333',
                 fontSize: '14px',
-                fontWeight: '400',
                 fontFamily: 'Montserrat, sans-serif',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                textTransform: 'capitalize'
+                textTransform: 'capitalize',
+                fontWeight: '400', // Lighter font weight
+                transition: 'color 0.3s ease'
               }}>
-                Join
-              </button>
-            </Link>
+                Home
+              </Link>
+              <Link href="https://knotless.bookerhq.ca/aboutUs" className="nav-link" style={{
+                textDecoration: 'none',
+                color: darkMode ? '#e0e0e0' : '#333',
+                fontSize: '14px',
+                fontFamily: 'Montserrat, sans-serif',
+                textTransform: 'capitalize',
+                fontWeight: '400',
+                transition: 'color 0.3s ease'
+              }}>
+                About
+              </Link>
+              <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" className="nav-link" style={{
+                textDecoration: 'none',
+                color: darkMode ? '#e0e0e0' : '#333',
+                fontSize: '14px',
+                fontFamily: 'Montserrat, sans-serif',
+                textTransform: 'capitalize',
+                fontWeight: '400',
+                transition: 'color 0.3s ease'
+              }}>
+                Stylists
+              </Link>
+              <Link href="/" className="nav-link" style={{
+                textDecoration: 'none',
+                color: darkMode ? '#e0e0e0' : '#333',
+                fontSize: '14px',
+                fontFamily: 'Montserrat, sans-serif',
+                textTransform: 'capitalize',
+                fontWeight: '400',
+                transition: 'color 0.3s ease'
+              }}>
+                Blog
+              </Link>
+              <Link href="/store" className="nav-link" style={{
+                textDecoration: 'none',
+                color: darkMode ? '#e0e0e0' : '#333',
+                fontSize: '14px',
+                fontFamily: 'Montserrat, sans-serif',
+                textTransform: 'capitalize',
+                fontWeight: '400',
+                transition: 'color 0.3s ease'
+              }}>
+                Store
+              </Link>
+              <Link href="https://knotless.bookerhq.ca/contactUs" className="nav-link" style={{
+                textDecoration: 'none',
+                color: darkMode ? '#e0e0e0' : '#333',
+                fontSize: '14px',
+                fontFamily: 'Montserrat, sans-serif',
+                textTransform: 'capitalize',
+                fontWeight: '400',
+                transition: 'color 0.3s ease'
+              }}>
+                Contact Us
+              </Link>
+            </nav>
           </div>
           
-          {/* Mobile Menu Button - Moved to the right of auth buttons */}
-          {windowSize.width < 991 && (
-            <button 
-              onClick={toggleMobileMenu}
-              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '8px',
-                zIndex: 200 // Ensure it stays on top when drawer is open
-              }}
-            >
-              <div style={{
-                width: '24px',
-                height: '2px',
-                backgroundColor: '#333',
-                marginBottom: '5px',
-                transition: 'transform 0.3s ease, opacity 0.3s ease',
-                transform: isMobileMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
-              }} />
-              <div style={{
-                width: '24px',
-                height: '2px',
-                backgroundColor: '#333',
-                marginBottom: '5px',
-                opacity: isMobileMenuOpen ? 0 : 1,
-                transition: 'opacity 0.3s ease'
-              }} />
-              <div style={{
-                width: '24px',
-                height: '2px',
-                backgroundColor: '#333',
-                transition: 'transform 0.3s ease',
-                transform: isMobileMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
-              }} />
-            </button>
-          )}
+          {/* Auth Buttons + Mobile Menu */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            paddingRight: '12px' // Added padding to the right of auth buttons
+          }}>
+            {/* Auth Buttons in their own row */}
+            <div className="auth-buttons" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px', // Reduced gap between buttons
+              padding: '6px' // Added padding around the auth buttons
+            }}>
+              <Link href="https://knotless.bookerhq.ca/login">
+                <button style={{
+                  background: '#F4B637', // Yellow color
+                  color: '#333',
+                  padding: '0 1.25rem',
+                  borderRadius: '24px',
+                  border: 'none',
+                  height: '38px', // Slightly reduced height
+                  fontSize: '14px',
+                  fontWeight: '400', // Lighter font weight
+                  fontFamily: 'Montserrat, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  textTransform: 'capitalize'
+                }}>
+                  Log In
+                </button>
+              </Link>
+              <Link href="https://knotless.bookerhq.ca/login">
+                <button style={{
+                  background: '#E9887E',
+                  color: 'white',
+                  padding: '0 1.25rem',
+                  borderRadius: '24px',
+                  border: 'none',
+                  height: '38px', // Slightly reduced height
+                  fontSize: '14px',
+                  fontWeight: '400', // Lighter font weight
+                  fontFamily: 'Montserrat, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  textTransform: 'capitalize'
+                }}>
+                  Join
+                </button>
+              </Link>
+            </div>
+            
+            {/* Mobile Menu Button - Only visible on mobile */}
+            {windowSize.width < 991 && (
+              <button 
+                onClick={toggleMobileMenu}
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  zIndex: 200
+                }}
+              >
+                <div style={{
+                  width: '24px',
+                  height: '2px',
+                  backgroundColor: darkMode ? 'white' : '#333',
+                  marginBottom: '5px',
+                  transition: 'transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease',
+                  transform: isMobileMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'
+                }} />
+                <div style={{
+                  width: '24px',
+                  height: '2px',
+                  backgroundColor: darkMode ? 'white' : '#333',
+                  marginBottom: '5px',
+                  opacity: isMobileMenuOpen ? 0 : 1,
+                  transition: 'opacity 0.3s ease, background-color 0.3s ease'
+                }} />
+                <div style={{
+                  width: '24px',
+                  height: '2px',
+                  backgroundColor: darkMode ? 'white' : '#333',
+                  transition: 'transform 0.3s ease, background-color 0.3s ease',
+                  transform: isMobileMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none'
+                }} />
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -325,15 +361,15 @@ export default function BaseLayout({
             />
           )}
           
-                      {/* Side drawer menu */}
+          {/* Side drawer menu */}
           <div style={{
             position: 'fixed',
             top: 0,
             right: isMobileMenuOpen ? 0 : '-100%',
             width: '100%',
-            maxWidth: '400px', // Match the width from the reference image
+            maxWidth: '400px',
             height: '100vh',
-            backgroundColor: 'white',
+            backgroundColor: darkMode ? '#1a1a1a' : 'white',
             zIndex: 180,
             transition: 'right 0.3s ease',
             overflowY: 'auto',
@@ -345,13 +381,12 @@ export default function BaseLayout({
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '1.75rem 1.5rem'
-              // borderBottom: '1px solid #eee'
             }}>
               <h2 style={{
                 margin: 0,
                 fontSize: '1.25rem',
                 fontWeight: '600',
-                color: '#222',
+                color: darkMode ? '#e0e0e0' : '#222',
                 fontFamily: 'Montserrat, sans-serif'
               }}>
                 Menu
@@ -378,7 +413,7 @@ export default function BaseLayout({
               </button>
             </div>
             
-            {/* Menu items - Styled to match the reference image */}
+            {/* Menu items */}
             <div style={{ padding: '0.5rem 0' }}>
               <Link 
                 href="https://knotless.bookerhq.ca/home"
@@ -389,8 +424,8 @@ export default function BaseLayout({
                   justifyContent: 'space-between',
                   padding: '1rem 1.5rem',
                   textDecoration: 'none',
-                  color: '#333',
-                  borderBottom: '1px solid #eee',
+                  color: darkMode ? '#e0e0e0' : '#333',
+                  borderBottom: `1px solid ${darkMode ? '#333' : '#eee'}`,
                   fontSize: '16px',
                   fontWeight: '400',
                   fontFamily: 'Montserrat, sans-serif'
@@ -423,8 +458,8 @@ export default function BaseLayout({
                   justifyContent: 'space-between',
                   padding: '1rem 1.5rem',
                   textDecoration: 'none',
-                  color: '#333',
-                  borderBottom: '1px solid #eee',
+                  color: darkMode ? '#e0e0e0' : '#333',
+                  borderBottom: `1px solid ${darkMode ? '#333' : '#eee'}`,
                   fontSize: '16px',
                   fontWeight: '400',
                   fontFamily: 'Montserrat, sans-serif'
@@ -457,8 +492,8 @@ export default function BaseLayout({
                   justifyContent: 'space-between',
                   padding: '1rem 1.5rem',
                   textDecoration: 'none',
-                  color: '#333',
-                  borderBottom: '1px solid #eee',
+                  color: darkMode ? '#e0e0e0' : '#333',
+                  borderBottom: `1px solid ${darkMode ? '#333' : '#eee'}`,
                   fontSize: '16px',
                   fontWeight: '400',
                   fontFamily: 'Montserrat, sans-serif'
@@ -491,8 +526,8 @@ export default function BaseLayout({
                   justifyContent: 'space-between',
                   padding: '1rem 1.5rem',
                   textDecoration: 'none',
-                  color: '#333',
-                  borderBottom: '1px solid #eee',
+                  color: darkMode ? '#e0e0e0' : '#333',
+                  borderBottom: `1px solid ${darkMode ? '#333' : '#eee'}`,
                   fontSize: '16px',
                   fontWeight: '400',
                   fontFamily: 'Montserrat, sans-serif'
@@ -525,8 +560,8 @@ export default function BaseLayout({
                   justifyContent: 'space-between',
                   padding: '1rem 1.5rem',
                   textDecoration: 'none',
-                  color: '#333',
-                  borderBottom: '1px solid #eee',
+                  color: darkMode ? '#e0e0e0' : '#333',
+                  borderBottom: `1px solid ${darkMode ? '#333' : '#eee'}`,
                   fontSize: '16px',
                   fontWeight: '400',
                   fontFamily: 'Montserrat, sans-serif'
@@ -559,8 +594,8 @@ export default function BaseLayout({
                   justifyContent: 'space-between',
                   padding: '1rem 1.5rem',
                   textDecoration: 'none',
-                  color: '#333',
-                  borderBottom: '1px solid #eee',
+                  color: darkMode ? '#e0e0e0' : '#333',
+                  borderBottom: `1px solid ${darkMode ? '#333' : '#eee'}`,
                   fontSize: '16px',
                   fontWeight: '400',
                   fontFamily: 'Montserrat, sans-serif'
@@ -584,51 +619,58 @@ export default function BaseLayout({
                 </div>
               </Link>
               
-              {/* Light/Dark mode toggles - Styled to match the reference image */}
+              {/* Light/Dark mode toggles */}
               <div style={{
                 padding: '1rem 1.5rem'
               }}>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  backgroundColor: '#f5f5f7',
+                  backgroundColor: darkMode ? '#333' : '#f5f5f7',
                   borderRadius: '8px',
                   padding: '0.5rem',
                   marginTop: '0.5rem'
                 }}>
-                  <button style={{
-                    flex: 1,
-                    background: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.5rem',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    marginRight: '0.5rem',
-                    color: '#333'
-                  }}>
+                  <button 
+                    onClick={() => setDarkMode(false)}
+                    style={{
+                      flex: 1,
+                      background: !darkMode ? 'white' : 'transparent',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.5rem',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: !darkMode ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      marginRight: '0.5rem',
+                      color: darkMode ? '#aaa' : '#333'
+                    }}
+                  >
                     <span style={{ marginRight: '0.5rem' }}>☀️</span>
                     Light Mode
                   </button>
-                  <button style={{
-                    flex: 1,
-                    background: 'transparent',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.5rem',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#666'
-                  }}>
+                  <button 
+                    onClick={() => setDarkMode(true)}
+                    style={{
+                      flex: 1,
+                      background: darkMode ? 'white' : 'transparent',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.5rem',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      color: darkMode ? '#333' : '#666'
+                    }}
+                  >
                     <span style={{ marginRight: '0.5rem' }}>🌙</span>
                     Dark Mode
                   </button>
@@ -643,13 +685,16 @@ export default function BaseLayout({
       {pageType === 'home' ? (
         <>
           {/* Hero Container for Home Page */}
-          <div className="hero-container">
+          <div className="hero-container" style={{
+            backgroundColor: darkMode ? '#121212' : undefined,
+            color: darkMode ? '#e0e0e0' : undefined
+          }}>
             {Array.isArray(children) && children.length > 0 ? children[0] : null}
           </div>
           
           {/* Main Content for Home Page */}
           <main className="main-content" style={{ 
-            backgroundColor: 'white',
+            backgroundColor: darkMode ? '#121212' : 'white',
             position: 'relative'
           }}>
             {Array.isArray(children) && children.length > 1 
@@ -660,18 +705,20 @@ export default function BaseLayout({
       ) : pageType === 'store' ? (
         /* Content for Store Page */
         <main style={{ 
-          backgroundColor: 'white',
-          paddingTop: '80px', /* Account for the fixed header */
-          minHeight: '70vh'
+          backgroundColor: darkMode ? '#121212' : 'white',
+          paddingTop: '80px', /* Adjusted for the 80px header height */
+          minHeight: '70vh',
+          color: darkMode ? '#e0e0e0' : 'inherit'
         }}>
           {children}
         </main>
       ) : (
         /* Regular Content for Other Pages */
         <main style={{ 
-          backgroundColor: 'white',
+          backgroundColor: darkMode ? '#121212' : 'white',
           paddingTop: getTopPadding(),
-          minHeight: '70vh'
+          minHeight: '70vh',
+          color: darkMode ? '#e0e0e0' : 'inherit'
         }}>
           {title && (
             <div style={{ padding: '2rem 1rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
@@ -679,14 +726,15 @@ export default function BaseLayout({
                 fontSize: windowSize.width < 768 ? '2rem' : '2.5rem', 
                 marginBottom: '1rem', 
                 fontWeight: 'bold', 
-                textAlign: 'center' 
+                textAlign: 'center',
+                color: darkMode ? '#e0e0e0' : '#333'
               }}>
                 {title}
               </h1>
               {description && (
                 <p style={{ 
                   marginBottom: '2rem', 
-                  color: '#666', 
+                  color: darkMode ? '#aaa' : '#666', 
                   textAlign: 'center',
                   fontSize: windowSize.width < 768 ? '1rem' : '1.25rem'
                 }}>
@@ -701,9 +749,11 @@ export default function BaseLayout({
 
       {/* Footer with responsive adjustments */}
       <footer style={{
-        backgroundColor: '#F5F5F5',
+        backgroundColor: darkMode ? '#1a1a1a' : '#F5F5F5',
         padding: '3rem 0',
-        marginTop: '2rem'
+        marginTop: '2rem',
+        color: darkMode ? '#e0e0e0' : 'inherit',
+        transition: 'background-color 0.3s ease'
       }}>
         <div style={{
           maxWidth: '1200px',
@@ -742,7 +792,7 @@ export default function BaseLayout({
                 />
               </Link>
               <p style={{ 
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem',
                 lineHeight: '1.6'
               }}>
@@ -762,41 +812,41 @@ export default function BaseLayout({
                 marginBottom: '1rem',
                 fontSize: '1.2rem',
                 fontWeight: '600',
-                color: '#333'
+                color: darkMode ? '#e0e0e0' : '#333'
               }}>Quick Links</h3>
               <Link href="https://knotless.bookerhq.ca/home" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Home</Link>
               <Link href="https://knotless.bookerhq.ca/aboutUs" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>About</Link>
               <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Stylists</Link>
               <Link href="/" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Blog</Link>
               <Link href="/store" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Store</Link>
               <Link href="https://knotless.bookerhq.ca/contactUs" style={{
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Contact Us</Link>
             </div>
@@ -813,23 +863,23 @@ export default function BaseLayout({
                 marginBottom: '1rem',
                 fontSize: '1.2rem',
                 fontWeight: '600',
-                color: '#333'
+                color: darkMode ? '#e0e0e0' : '#333'
               }}>Terms</h3>
               <Link href="https://knotless.bookerhq.ca/PrivacyPolicy" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Privacy Policy</Link>
               <Link href="https://knotless.bookerhq.ca/TermsOfService" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Terms of Service</Link>
               <Link href="/" style={{
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Land Acknowledgement</Link>
             </div>
@@ -846,11 +896,11 @@ export default function BaseLayout({
                 marginBottom: '1rem',
                 fontSize: '1.2rem',
                 fontWeight: '600',
-                color: '#333'
+                color: darkMode ? '#e0e0e0' : '#333'
               }}>Follow Us</h3>
               <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer" style={{
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem',
                 marginBottom: '0.5rem'
               }}>
@@ -858,7 +908,7 @@ export default function BaseLayout({
               </Link>
               <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem',
                 marginBottom: '0.5rem'
               }}>
@@ -866,7 +916,7 @@ export default function BaseLayout({
               </Link>
               <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={{
                 textDecoration: 'none',
-                color: '#666',
+                color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>
                 Facebook
@@ -876,16 +926,33 @@ export default function BaseLayout({
           
           {/* Copyright Section */}
           <div style={{
-            borderTop: '1px solid #ddd',
+            borderTop: darkMode ? '1px solid #333' : '1px solid #ddd',
             paddingTop: '1.5rem',
             textAlign: 'center'
           }}>
-            <p style={{ color: '#666', fontSize: '0.9rem' }}>
+            <p style={{ color: darkMode ? '#aaa' : '#666', fontSize: '0.9rem' }}>
               &copy; {new Date().getFullYear()} Knotless. All rights reserved.
             </p>
           </div>
         </div>
-      </footer>   
+      </footer>
+      
+      {/* Add CSS for dark mode transitions */}
+      <style jsx global>{`
+        body {
+          transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .dark-mode {
+          background-color: #121212;
+          color: #e0e0e0;
+        }
+        
+        /* Improved hover effects for nav links */
+        .nav-link:hover {
+          color: ${darkMode ? '#FFD700' : '#E9887E'} !important;
+        }
+      `}</style>
     </div>
   );
 }
