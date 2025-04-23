@@ -9,7 +9,7 @@ const StoreHero = () => {
     <div className="store-hero-container" style={{
       position: 'relative',
       backgroundColor: '#222',
-      backgroundImage: 'url("/images/store_hero4.jpg")', // New image path
+      backgroundImage: 'url("/images/store_hero5.jpg")', // New image path
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       width: '100%',
