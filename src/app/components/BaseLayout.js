@@ -175,7 +175,7 @@ export default function BaseLayout({
               alignItems: 'center',
               gap: '12px', // 12px spacing between nav items
             }}>
-              <Link href="https://knotless.bookerhq.ca/home" className="nav-link" style={{
+              <Link href="https://knotless.co/home" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
                 fontSize: '14px',
@@ -186,7 +186,7 @@ export default function BaseLayout({
               }}>
                 Home
               </Link>
-              <Link href="https://knotless.bookerhq.ca/aboutUs" className="nav-link" style={{
+              <Link href="https://knotless.co/aboutUs" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
                 fontSize: '14px',
@@ -197,7 +197,7 @@ export default function BaseLayout({
               }}>
                 About
               </Link>
-              <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" className="nav-link" style={{
+              <Link href="https://knotless.co/SearchResultsKnotless?searchTermHomePar" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
                 fontSize: '14px',
@@ -230,7 +230,7 @@ export default function BaseLayout({
               }}>
                 Store
               </Link>
-              <Link href="https://knotless.bookerhq.ca/contactUs" className="nav-link" style={{
+              <Link href="https://knotless.co/contactUs" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
                 fontSize: '14px',
@@ -258,7 +258,7 @@ export default function BaseLayout({
               gap: '8px', // Reduced gap between buttons
               padding: '6px' // Added padding around the auth buttons
             }}>
-              <Link href="https://knotless.bookerhq.ca/login">
+              <Link href="https://knotless.co/login">
                 <button style={{
                   background: '#F4B637', // Yellow color
                   color: '#333',
@@ -277,7 +277,7 @@ export default function BaseLayout({
                   Log In
                 </button>
               </Link>
-              <Link href="https://knotless.bookerhq.ca/login">
+              <Link href="https://knotless.co/login">
                 <button style={{
                   background: '#E9887E',
                   color: 'white',
@@ -416,7 +416,7 @@ export default function BaseLayout({
             {/* Menu items */}
             <div style={{ padding: '0.5rem 0' }}>
               <Link 
-                href="https://knotless.bookerhq.ca/home"
+                href="https://knotless.co/home"
                 onClick={toggleMobileMenu}
                 style={{
                   display: 'flex',
@@ -450,7 +450,7 @@ export default function BaseLayout({
               </Link>
               
               <Link 
-                href="https://knotless.bookerhq.ca/aboutUs"
+                href="https://knotless.co/aboutUs"
                 onClick={toggleMobileMenu}
                 style={{
                   display: 'flex',
@@ -484,7 +484,7 @@ export default function BaseLayout({
               </Link>
               
               <Link 
-                href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar"
+                href="https://knotless.co/SearchResultsKnotless?searchTermHomePar"
                 onClick={toggleMobileMenu}
                 style={{
                   display: 'flex',
@@ -586,7 +586,7 @@ export default function BaseLayout({
               </Link>
 
               <Link 
-                href="https://knotless.bookerhq.ca/contactUs"
+                href="https://knotless.co/contactUs"
                 onClick={toggleMobileMenu}
                 style={{
                   display: 'flex',
@@ -773,7 +773,7 @@ export default function BaseLayout({
               width: windowSize.width < 768 ? '100%' : 'auto',
               textAlign: windowSize.width < 768 ? 'center' : 'left'
             }}>
-              <Link href="https://knotless.bookerhq.ca/" style={{
+              <Link href="https://knotless.co/" style={{
                 textDecoration: 'none',
                 fontSize: '1.75rem',
                 fontWeight: 'bold',
@@ -814,19 +814,19 @@ export default function BaseLayout({
                 fontWeight: '600',
                 color: darkMode ? '#e0e0e0' : '#333'
               }}>Quick Links</h3>
-              <Link href="https://knotless.bookerhq.ca/home" style={{
+              <Link href="https://knotless.co/home" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Home</Link>
-              <Link href="https://knotless.bookerhq.ca/aboutUs" style={{
+              <Link href="https://knotless.co/aboutUs" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>About</Link>
-              <Link href="https://knotless.bookerhq.ca/SearchResultsKnotless?searchTermHomePar" style={{
+              <Link href="https://knotless.co/SearchResultsKnotless?searchTermHomePar" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
@@ -844,7 +844,7 @@ export default function BaseLayout({
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Store</Link>
-              <Link href="https://knotless.bookerhq.ca/contactUs" style={{
+              <Link href="https://knotless.co/contactUs" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
@@ -865,13 +865,13 @@ export default function BaseLayout({
                 fontWeight: '600',
                 color: darkMode ? '#e0e0e0' : '#333'
               }}>Terms</h3>
-              <Link href="https://knotless.bookerhq.ca/PrivacyPolicy" style={{
+              <Link href="https://knotless.co/PrivacyPolicy" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Privacy Policy</Link>
-              <Link href="https://knotless.bookerhq.ca/TermsOfService" style={{
+              <Link href="https://knotless.co/TermsOfService" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',

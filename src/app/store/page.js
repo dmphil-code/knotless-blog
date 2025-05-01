@@ -282,36 +282,36 @@ export default function StorePage() {
       <div className="store-hero-container" style={{
         position: 'relative',
         backgroundColor: '#222',
-        backgroundImage: 'url("/images/store_hero5.jpg")',
+        backgroundImage: 'url("/images/store_hero.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        // border: '2px solid #E9887E',
+        border: '2px solid #E9887E',
         width: '100%',
         height: windowSize.width < 768 ? '260px' : '350px',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
         marginBottom: '40px'
       }}>
         <div style={{
           maxWidth: '1200px',
           width: '100%',
           margin: '0 auto',
-          padding: '0 0 20px',
+          padding: '40px 0 20px',
         }}>
           <h1 style={{ 
             fontSize: windowSize.width < 768 ? '2.5rem' : '5.5rem',
             fontWeight: '800', // Increased from 700 to 800 for thicker text
-            color: 'white',
-            textShadow: `
-              -3px -3px 0 #773800,  
-              3px -3px 0 #773800,
-              -3px 3px 0 #773800,
-              3px 3px 0 #773800,
-              0px 3px 0 #773800,
-              3px 0px 0 #773800,
-              0px -3px 0 #773800,
-              -3px 0px 0 #773800 `, // Thicker and darker outline using multiple shadows with the dark brown from brand guide
+            color: '#E9887E',
+            // textShadow: `
+            //   -3px -3px 0 #773800,  
+            //   3px -3px 0 #773800,
+            //   -3px 3px 0 #773800,
+            //   3px 3px 0 #773800,
+            //   0px 3px 0 #773800,
+            //   3px 0px 0 #773800,
+            //   0px -3px 0 #773800,
+            //   -3px 0px 0 #773800 `, // Thicker and darker outline using multiple shadows with the dark brown from brand guide
             fontFamily: "'Bauhaus Soft Display', sans-serif",
             margin: 0,
             lineHeight: 1.2
