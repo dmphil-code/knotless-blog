@@ -148,7 +148,7 @@ export default function BaseLayout({
               width: '200px', // Set a fixed width for the logo container
               marginLeft: '0', // Remove any left margin
             }}>
-              <Link href="/" style={{ 
+              <Link href="https://knotless.co/home" style={{ 
                 display: 'block',
                 height: '100%',
                 width: '100%'
@@ -197,7 +197,7 @@ export default function BaseLayout({
               }}>
                 About
               </Link>
-              <Link href="https://knotless.co/SearchResultsKnotless?searchTermHomePar" className="nav-link" style={{
+              {/* <Link href="https://knotless.co/SearchResultsKnotless?searchTermHomePar" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
                 fontSize: '14px',
@@ -207,7 +207,7 @@ export default function BaseLayout({
                 transition: 'color 0.3s ease'
               }}>
                 Stylists
-              </Link>
+              </Link> */}
               <Link href="/" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
@@ -219,7 +219,7 @@ export default function BaseLayout({
               }}>
                 Blog
               </Link>
-              <Link href="/store" className="nav-link" style={{
+              {/* <Link href="/store" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
                 fontSize: '14px',
@@ -229,7 +229,7 @@ export default function BaseLayout({
                 transition: 'color 0.3s ease'
               }}>
                 Store
-              </Link>
+              </Link> */}
               <Link href="https://knotless.co/contactUs" className="nav-link" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#e0e0e0' : '#333',
@@ -483,7 +483,7 @@ export default function BaseLayout({
                 </div>
               </Link>
               
-              <Link 
+              {/* <Link 
                 href="https://knotless.co/SearchResultsKnotless?searchTermHomePar"
                 onClick={toggleMobileMenu}
                 style={{
@@ -515,7 +515,7 @@ export default function BaseLayout({
                     <polyline points="7 7 17 7 17 17"></polyline>
                   </svg>
                 </div>
-              </Link>
+              </Link> */}
               
               <Link 
                 href="/"
@@ -551,7 +551,7 @@ export default function BaseLayout({
                 </div>
               </Link>
               
-              <Link 
+              {/* <Link 
                 href="/store"
                 onClick={toggleMobileMenu}
                 style={{
@@ -583,7 +583,7 @@ export default function BaseLayout({
                     <polyline points="7 7 17 7 17 17"></polyline>
                   </svg>
                 </div>
-              </Link>
+              </Link> */}
 
               <Link 
                 href="https://knotless.co/contactUs"
@@ -773,7 +773,7 @@ export default function BaseLayout({
               width: windowSize.width < 768 ? '100%' : 'auto',
               textAlign: windowSize.width < 768 ? 'center' : 'left'
             }}>
-              <Link href="https://knotless.co/" style={{
+              <Link href="https://knotless.co/home" style={{
                 textDecoration: 'none',
                 fontSize: '1.75rem',
                 fontWeight: 'bold',
@@ -826,24 +826,24 @@ export default function BaseLayout({
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>About</Link>
-              <Link href="https://knotless.co/SearchResultsKnotless?searchTermHomePar" style={{
+              {/* <Link href="https://knotless.co/SearchResultsKnotless?searchTermHomePar" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
-              }}>Stylists</Link>
+              }}>Stylists</Link> */}
               <Link href="/" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
               }}>Blog</Link>
-              <Link href="/store" style={{
+              {/* <Link href="/store" style={{
                 marginBottom: '0.5rem',
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
                 fontSize: '0.95rem'
-              }}>Store</Link>
+              }}>Store</Link> */}
               <Link href="https://knotless.co/contactUs" style={{
                 textDecoration: 'none',
                 color: darkMode ? '#aaa' : '#666',
