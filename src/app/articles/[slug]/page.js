@@ -362,8 +362,7 @@ export default function ArticleDetail() {
               </div>
               
               {/* Store button */}
-              <Link 
-                href="/store" 
+              <div
                 style={{ 
                   backgroundColor: '#E9887E',
                   color: 'white',
@@ -374,8 +373,8 @@ export default function ArticleDetail() {
                   textAlign: 'center'
                 }}
               >
-                Store
-              </Link>
+                Store - Coming Soon
+              </div>
               
               {/* Next Article button */}
               <div 
