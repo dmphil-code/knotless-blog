@@ -166,6 +166,7 @@ const AffLinkCard = ({ affiliate, isWrappedInLink = false, onClick = null }) => 
           justifyContent: 'center',
           width: '100%',
           height: '100%',
+          cursor: 'default' // Change cursor to default when non-clickable
         }}>
           {cardContent}
         </div>

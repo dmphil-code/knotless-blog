@@ -715,7 +715,7 @@ export default function BaseLayout({
       ) : (
         /* Regular Content for Other Pages */
         <main style={{ 
-          backgroundColor: darkMode ? '#121212' : 'white',
+          backgroundColor: darkMode ? '#121212' : (pageType === 'article' ? '#FFE8C9' : 'white'),
           paddingTop: getTopPadding(),
           minHeight: '70vh',
           color: darkMode ? '#e0e0e0' : 'inherit'

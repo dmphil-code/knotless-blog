@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import useWindowSize from '../../hooks/useWindowSize';
 import { processRichTextContent } from '../../utils/richTextProcessor';
 import AffLinkCard from '../../components/AffLinkCard';
+import ImageTextWrap from '../../components/ImageTextWrap';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -16,7 +17,6 @@ export default function ArticleDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const windowSize = useWindowSize();
-  const [contentSections, setContentSections] = useState(['', '', '']);
   const [prevArticle, setPrevArticle] = useState(null);
   const [nextArticle, setNextArticle] = useState(null);
   // State to track hover state for buttons
@@ -46,11 +46,6 @@ export default function ArticleDetail() {
           setError('Article not found');
         } else {
           setArticle(articleData);
-          
-          // Process content when article is loaded
-          const contentToDisplay = articleData.content ? processRichTextContent(articleData.content) : '';
-          const sections = splitContent(contentToDisplay);
-          setContentSections(sections);
           
           // Fetch all articles to determine prev/next
           fetchAdjacentArticles(articleData.id);
@@ -92,27 +87,6 @@ export default function ArticleDetail() {
       
     } catch (error) {
       console.error("Error fetching adjacent articles:", error);
-    }
-  };
-
-  // Split content into three sections
-  const splitContent = (content) => {
-    if (!content) return ['', '', ''];
-    
-    const paragraphs = content.split('\n\n');
-    
-    if (paragraphs.length <= 3) {
-      // If 3 or fewer paragraphs, each one is a section
-      return paragraphs.concat(Array(3 - paragraphs.length).fill(''));
-    } else {
-      // Otherwise, distribute paragraphs evenly across 3 sections
-      const sectionSize = Math.ceil(paragraphs.length / 3);
-      
-      const section1 = paragraphs.slice(0, sectionSize).join('\n\n');
-      const section2 = paragraphs.slice(sectionSize, sectionSize * 2).join('\n\n');
-      const section3 = paragraphs.slice(sectionSize * 2).join('\n\n');
-      
-      return [section1, section2, section3];
     }
   };
 
@@ -205,24 +179,30 @@ export default function ArticleDetail() {
     a: ({ children, href }) => <a href={href} style={{color: '#E9887E', textDecoration: 'underline'}}>{children}</a>,
     strong: ({ children }) => <strong style={{fontWeight: 'bold', color: '#333'}}>{children}</strong>,
     blockquote: ({ children }) => <blockquote style={{
-      borderLeft: '4px solid #E9887E',
-      paddingLeft: '1.5rem',
-      marginLeft: '0',
-      marginRight: '0',
-      marginTop: '1.5rem',
-      marginBottom: '1.5rem',
-      fontStyle: 'italic',
-      color: '#555'
-    }}>{children}</blockquote>
+      margin: '24px 0',
+      padding: '20px 40px',
+      backgroundColor: '#FFF8F0',
+      borderRadius: '8px',
+      textAlign: 'center',
+      fontFamily: "'Bauhaus Soft Display', sans-serif",
+      fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '1.75rem' :  windowSize < 1200 ? '2.5rem' : '2.75rem', 
+      fontWeight: '600',
+      color: '#773800',
+      lineHeight: '1.3',
+      marginBottom: '10px'
+      }}>
+      {children}</blockquote>
   };
 
   return (
     <ArticleLayout>
-      <div style={{ position: 'relative', width: '100%', backgroundColor: 'white' }}>
+      <div style={{ position: 'relative', width: '100%', backgroundColor: '#FFE8C9',
+        
+       }}>
         {/* Main content container */}
         <div style={{ 
           maxWidth: '1000px',
-          margin: '0 auto',
+          margin: '-2rem auto',
           padding: '40px 20px 60px',
           position: 'relative'
         }}>
@@ -451,47 +431,78 @@ export default function ArticleDetail() {
             margin: '0 auto', 
             position: 'relative'
           }}>
-            {/* Section 1 */}
-            <div className="article-section" style={{ 
-              marginBottom: article.excerpt ? '70px' : '30px',
-            }}>
-              <ReactMarkdown components={components}>
-                {contentSections[0]}
-              </ReactMarkdown>
+            {/* Article content with image wrap */}
+          {article.content ? (
+            <div className="article-content">
+              {(() => {
+                try {
+                  // Process the rich text content
+                  const processedContent = processRichTextContent(article.content);
+                  
+                  // Check for title in the content and remove it if present
+                  let contentWithoutTitle = processedContent;
+                  
+                  // If there's a title in H1 format at the beginning, remove it
+                  if (contentWithoutTitle && typeof contentWithoutTitle === 'string' && contentWithoutTitle.startsWith('# ')) {
+                    // Remove the first line if it's a title
+                    contentWithoutTitle = contentWithoutTitle
+                      .split('\n')
+                      .slice(1)
+                      .join('\n')
+                      .trim();
+                  }
+                  
+                  // Get the image URL for the thumbnail
+                  const imageUrl = article.thumbnail && article.thumbnail.url ? article.thumbnail.url : null;
+                  
+                  // Simple content display with image wrap at the beginning
+                  if (contentWithoutTitle && typeof contentWithoutTitle === 'string') {
+                    if (imageUrl) {
+                      return (
+                        <ImageTextWrap 
+                          image={imageUrl} 
+                          alt={article.title || 'Article image'}
+                          imageWidth="40%" 
+                          imageMargin="0 20px 15px 0"
+                        >
+                          <ReactMarkdown components={components}>
+                            {contentWithoutTitle}
+                          </ReactMarkdown>
+                        </ImageTextWrap>
+                      );
+                    } else {
+                      return (
+                        <ReactMarkdown components={components}>
+                          {contentWithoutTitle}
+                        </ReactMarkdown>
+                      );
+                    }
+                  } else {
+                    return (
+                      <p style={{ color: '#666' }}>
+                        No content available for this article.
+                      </p>
+                    );
+                  }
+                } catch (error) {
+                  console.error("Error rendering article content:", error);
+                  return (
+                    <div style={{ padding: '2rem 0' }}>
+                      <p style={{ color: '#666' }}>
+                        There was an error rendering this article content. Please try again later.
+                      </p>
+                    </div>
+                  );
+                }
+              })()}
             </div>
-            
-            {/* Article excerpt if available - between sections 1 and 2 */}
-            {article.excerpt ? (
-              <div style={{
-                marginBottom: '70px',
-                padding: '20px 40px',
-                backgroundColor: '#FFF8F0',
-                borderRadius: '8px',
-                textAlign: 'center'
-              }}>
-                <h3 style={{
-                  fontFamily: "'Bauhaus Soft Display', sans-serif",
-                  fontSize: windowSize.width < 768 ? '1.75rem' : '2.25rem',
-                  fontWeight: '600',
-                  color: '#773800',
-                  lineHeight: '1.3',
-                  marginBottom: '10px'
-                }}>
-                  {article.excerpt}
-                </h3>
-              </div>
-            ) : null}
-            
-            {/* Section 2 */}
-            {contentSections[1] && (
-              <div className="article-section" style={{ 
-                marginBottom: '70px',
-              }}>
-                <ReactMarkdown components={components}>
-                  {contentSections[1]}
-                </ReactMarkdown>
-              </div>
-            )}
+          ) : (
+            <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+              <p style={{ fontSize: '1.1rem', color: '#666' }}>
+                This article has no content.
+              </p>
+            </div>
+          )}
             
             {/* Products We Love section - in a colored container between sections 2 and 3 */}
             {article.affiliates && article.affiliates.length > 0 && (
@@ -534,7 +545,9 @@ export default function ArticleDetail() {
                           company: affiliate.company || '',
                           image: affiliate.image?.url || null,
                           brand: affiliate.brand || null
-                        }} 
+                        }}
+                        isWrappedInLink={true} // This makes the card non-clickable
+                        onClick={null} // Ensure no click action 
                       />
                     </div>
                   ))}
@@ -556,15 +569,6 @@ export default function ArticleDetail() {
                     </Link>
                   </div>
                 )}
-              </div>
-            )}
-            
-            {/* Section 3 */}
-            {contentSections[2] && (
-              <div className="article-section">
-                <ReactMarkdown components={components}>
-                  {contentSections[2]}
-                </ReactMarkdown>
               </div>
             )}
             
