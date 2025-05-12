@@ -592,13 +592,14 @@ export default function ArticleDetail() {
                   gap: '0.5rem' 
                 }}>
                   {article.categories.map((category) => (
-                    <Link
+                    <div
                       key={category.id}
                       href={`/categories/${category.slug || category.id}`}
                       style={{ 
                         backgroundColor: '#FFE8C9', 
                         color: '#773800',
                         padding: windowSize.width < 480 ? '0.4rem 0.8rem' : '0.5rem 1rem', 
+                        border: '2px solid #773800', 
                         borderRadius: '2rem', 
                         fontSize: windowSize.width < 480 ? '0.8rem' : '0.875rem',
                         textDecoration: 'none',
@@ -606,7 +607,7 @@ export default function ArticleDetail() {
                       }}
                     >
                       {category.name}
-                    </Link>
+                    </div>
                   ))}
                 </div>
               </div>
